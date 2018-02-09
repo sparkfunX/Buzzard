@@ -18,11 +18,17 @@
 </head>
 
 <body>
-<span>Label Text</span>
-<input type="text" id="labelText" value="GND">
-<br>
-<span>Label Font</span>
-<select id="labelFont" class="input">
+<div id="labelMaker">
+  <div id="outputWindow">
+    <canvas id="labelCanvas">
+    </canvas>
+  </div>
+  <div id="controlWindow">
+    <span class="ctlLabel">Label Text</span>
+    <input type="text" id="labelText" value="GND">
+    <br>
+    <span class="ctlLabel">Label Font</span>
+    <select id="labelFont" class="input">
       <option value="Bree Serif">Bree Serif</option>
       <option value="Russo One">Russo One</option>
       <option value="Days One">Days One</option>
@@ -31,57 +37,63 @@
       <option value="Secular One">Secular One</option>
       <option value="Krona One">Krona One</option>
       <option value="Righteous">Righteous</option>
-      <option value="Fredoka One" selected ="selected">Fredoka One</option>
-      <option value="Lobster">Lobster</option>   
-      <option value="Comfortaa">Comfortaa</option>   
-</select>
-<br>
-<span>Font Size</span>
-<input type="number" id="fontSize" value="36">
-<br>
-<span>Vertical Offset</span>
-<input type="number" id="fontOffsetV" value="7">
-<br>
-<span>Left Cap Style</span>
-<select id="leftCapStyle" class="input">
+      <option value="Fredoka One" selected="selected">Fredoka One</option>
+      <option value="Lobster">Lobster</option>
+      <option value="Comfortaa">Comfortaa</option>
+    </select>
+    <br>
+    <span class="ctlLabel">Font Size</span>
+    <input type="number" id="fontSize" value="36">
+    <br>
+    <span class="ctlLabel">Vertical Offset</span>
+    <input type="number" id="fontOffsetV" value="7">
+    <br>
+    <span class="ctlLabel">Left Cap Style</span>
+    <select id="leftCapStyle" class="input">
       <option value="square">square</option>
-      <option value="rounded" selected ="selected">rounded</option>
+      <option value="rounded" selected="selected">rounded</option>
       <option value="pointer">pointer</option>
       <option value="forwardslash">forwardslash</option>
       <option value="backslash">backslash</option>
-</select>
-<br>
-<span>Right Cap Style</span>
-<select id="rightCapStyle" class="input">
+    </select>
+    <br>
+    <span class="ctlLabel">Right Cap Style</span>
+    <select id="rightCapStyle" class="input">
       <option value="square">square</option>
-      <option value="rounded" selected ="selected">rounded</option>
+      <option value="rounded" selected="selected">rounded</option>
       <option value="pointer">pointer</option>
       <option value="forwardslash">forwardslash</option>
       <option value="backslash">backslash</option>
-</select>
-<br>
-<span>Sharpness</span>
-<br>
-<input type="range" min="250" max="765" value="650" id="sharpness">
-<br>
-<span>EAGLE Scale Factor</span>
-<br>
-<input type="number" id="scaleFactor" value="0.06">
-<br><br>
-<input type="button" value="generate" id="drawLabelButton">
-<input type="button" value="invert preview" id="invertCanvasButton">
-<br>
-<br>
-<span id="realSize"></span>
-<br>
-<canvas id="labelCanvas">
-</canvas>
-<br>
-<a id="download">download</a>
-<input type="button" value="Download EAGLE Board File" id="downloadBrd">
-<br>
-<br>
-<textarea id="output"></textarea>
+    </select>
+    <br>
+    <span class="ctlLabel">Sharpness</span>
+    <br>
+    <input type="range" min="250" max="765" value="650" id="sharpness">
+    <br>
+    <span class="ctlLabel">EAGLE Scale Factor</span>
+    <br>
+    <input type="number" id="scaleFactor" value="0.06">
+    <br>
+    <span id="realSize"></span>
+    <br>
+    <input type="button" value="Download EAGLE Board File" id="downloadBrd">
+    <br>
+    <br>
+    <span class="ctlLabel">Append to EAGLE Library</span>
+    <br>
+    <input type="file" value="Append to EAGLE Library" id="appendLib" accept=".lbr">   
+    <br>
+    <input type="button" value="Download Appended Library" id="downloadLib" disabled> 
+    <br>
+    <br>
+        <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
+    <label class="ctlLabel" id="invert_label" for="invertCanvasCheck">Invert Preview</label>
+    <br>
+    <input type="checkbox" value="Show XML" id="showXML">
+    <label class="ctlLabel" id="showxml_label" for="showXML">Show XML</label>
+  </div>
+</div>
+<textarea id="output" style="visibility: hidden;"></textarea>
 <script src="js/logic.js"></script>
 </body>
 </html>
