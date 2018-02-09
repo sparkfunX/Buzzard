@@ -1,16 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Allerta|Bree+Serif|Days+One|Doppio+One|Fredoka+One|Krona+One|Lobster|Righteous|Russo+One|Secular+One|Comfortaa');
-
-body{
-  
+body {
   font-family: "Verdana", sans-serif;
-
 }
 
 #output {
-  
   height: 300px;
   width: 500px;
-  
 }
 
 #labelCanvas {
@@ -19,6 +14,25 @@ body{
   border-color: black;
 }
 
-#download {
-  visibility: hidden;
+#controlWindow {
+  float: left;
+  margin-left: 15px;
 }
+
+#outputWindow {
+  float: left;
+}
+
+#labelMaker {
+  width: 100%;
+  overflow: hidden;
+}
+
+.ctlLabel {
+  font-size: 12px;
+}
+
+#realSize {
+  font-size: 12px;
+}
+
