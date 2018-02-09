@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css?family=Allerta|Bree+Serif|Days+One|Doppio+One|Fredoka+One|Krona+One|Lobster|Righteous|Russo+One|Secular+One|Comfortaa');
+
+body{
+  
+  font-family: "Verdana", sans-serif;
+
+}
+
+#output {
+  
+  height: 300px;
+  width: 500px;
+  
+}
+
+#labelCanvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+}
+
+#download {
+  visibility: hidden;
+}
