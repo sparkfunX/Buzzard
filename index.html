@@ -18,6 +18,38 @@
 </head>
 
 <body>
+<div id="navHeader">
+  <img src="/logo-1-gray.png" width="40px" height="40px" id="logo">
+  <span id="title">BUZZARD</span>
+  <span id="subtitle">EAGLE Utilities</span>
+  <a href="https://github.com/sparkfunX/Buzzard/wiki/Getting-Started" id="docsLink">Docs</a>
+  <a href="https://github.com/sparkfunX/Buzzard" id="repoLink">Github Repo</a>
+</div>
+<div id="navXtend"></div>
+<div id="navBar">
+  <div id="tabGroup">
+    <div id="tabAnchor">
+
+      <div id="labelMakerTab" class="tab selected">
+        Label Maker
+      </div>
+
+      <div id="padDesignerTab" class="tab unselected">
+        Pad Designer
+      </div>
+
+      <div id="imageImporterTab" class="tab unselected">
+        Image Importer
+      </div>
+
+      <div id="libraryManagerTab" class="tab unselected">
+        Library Manager
+      </div>
+
+    </div>
+  </div>
+  <div id="tabline"></div>
+</div>
 <div id="labelMaker">
   <div id="outputWindow">
     <canvas id="labelCanvas">
@@ -81,12 +113,12 @@
     <br>
     <span class="ctlLabel">Append to EAGLE Library</span>
     <br>
-    <input type="file" value="Append to EAGLE Library" id="appendLib" accept=".lbr">   
+    <input type="file" value="Append to EAGLE Library" id="appendLib" accept=".lbr">
     <br>
-    <input type="button" value="Download Appended Library" id="downloadLib" disabled> 
+    <input type="button" value="Download Appended Library" id="downloadLib" disabled>
     <br>
     <br>
-        <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
+    <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
     <label class="ctlLabel" id="invert_label" for="invertCanvasCheck">Invert Preview</label>
     <br>
     <input type="checkbox" value="Show XML" id="showXML">
