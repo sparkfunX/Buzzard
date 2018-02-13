@@ -5,10 +5,8 @@ body {
 }
 
 #output {
-  height: 200px;
-  width: 730px;
-  margin-left: auto;
-  margin-right: auto;
+  height: 300px;
+  width: 500px;
 }
 
 #labelCanvas {
@@ -28,7 +26,7 @@ body {
 }
 
 #labelMaker {
-  width: 740px;
+  width: 730px;
   overflow: hidden;
   margin-left: auto;
   margin-right: auto;
@@ -173,50 +171,6 @@ body {
   width: 730px;
   margin-left: auto;
   margin-right: auto;
-}
-
-#labelGroup {
-  height: 50px;
-  width: 240px;
-  background-color: #fafbfc;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  overflow-y: scroll;
-}
-
-.popLabel {
-  height: 10px;
-  max-height: 10px;
-  width: auto;
-  background-color: #ff0066;
-  margin: 3px;
-  display: inline-block;
-  font-size: 8px;
-  text-align: center;
-  font-weight: bold;
-  padding: 5px;
-  color: white;
-  border-radius: 8px;
-  cursor: default;
-  position: relative;
-}
-
-.deleteButton {
-  height: 8px;
-  max-height: 8px;
-  width: 8px;
-  border-radius: 4px;
-  background-color: white;
-  font-size: 6px;
-  color: black;
-  cursor: pointer;
-  position: absolute;
-  top: -1px;
-  right: -3px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-  z-index: 100;
 }
 
 a:link {

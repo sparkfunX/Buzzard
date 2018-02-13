@@ -4,7 +4,6 @@ var fixedHeight = 41;
 ctx.canvas.width = 405;
 ctx.canvas.height = 405;
 ctx.font = "36px Fredoka One"
-var popCount = 0;
 
 function drawLabel() {
 
@@ -105,7 +104,6 @@ function loadFont() {
 
   var canvas = document.getElementById("labelCanvas");
   var ctx = canvas.getContext("2d");
-  ctx.font = "30px Arial";
   var testwidth = ctx.measureText("teststring").width;
 
   var fontString = document.getElementById("fontSize").value + "px " + document.getElementById("labelFont").value;
@@ -117,6 +115,7 @@ function loadFont() {
     // wait for font width to change
   }
   console.log("Success!");
+
   setTimeout(function() {
     drawLabel();
   }, 1000);
@@ -131,8 +130,9 @@ document.getElementById("sharpness").onchange = drawLabel;
 document.getElementById("leftCapStyle").onchange = drawLabel;
 document.getElementById("rightCapStyle").onchange = drawLabel;
 document.getElementById("fontOffsetV").onchange = drawLabel;
+document.getElementById("labelText").onchange = drawLabel;
 document.getElementById("scaleFactor").onchange = drawLabel;
-document.getElementById("labelText").onkeyup = popLabel;
+
 document.getElementById("showXML").onchange = function() {
 
   if (document.getElementById("showXML").checked == false) {
@@ -288,157 +288,23 @@ function findDimensions() {
 
 }
 
-$("#downloadLib").click(function() {
-  document.getElementById("labelText").value += ",";
-  $("#labelText").trigger("keyup");
-  var head = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE eagle SYSTEM \"eagle.dtd\">\n<eagle version=\"7.7.0\">\n<drawing>\n<settings>\n<setting alwaysvectorfont=\"no\"\/>\n<setting verticaltext=\"up\"\/>\n<\/settings>\n<grid distance=\"1\" unitdist=\"mm\" unit=\"mm\" style=\"lines\" multiple=\"1\" display=\"yes\" altdistance=\"0.1\" altunitdist=\"mm\" altunit=\"mm\"\/>\n<layers>\n<layer number=\"1\" name=\"Top\" color=\"4\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"2\" name=\"Route2\" color=\"1\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"3\" name=\"Route3\" color=\"4\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"4\" name=\"Route4\" color=\"1\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"5\" name=\"Route5\" color=\"4\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"6\" name=\"Route6\" color=\"1\" fill=\"8\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"7\" name=\"Route7\" color=\"4\" fill=\"8\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"8\" name=\"Route8\" color=\"1\" fill=\"2\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"9\" name=\"Route9\" color=\"4\" fill=\"2\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"10\" name=\"Route10\" color=\"1\" fill=\"7\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"11\" name=\"Route11\" color=\"4\" fill=\"7\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"12\" name=\"Route12\" color=\"1\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"13\" name=\"Route13\" color=\"4\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"14\" name=\"Route14\" color=\"1\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"15\" name=\"Route15\" color=\"4\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"16\" name=\"Bottom\" color=\"1\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"17\" name=\"Pads\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"18\" name=\"Vias\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"19\" name=\"Unrouted\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"20\" name=\"Dimension\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"21\" name=\"tPlace\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"22\" name=\"bPlace\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"23\" name=\"tOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"24\" name=\"bOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"25\" name=\"tNames\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"26\" name=\"bNames\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"27\" name=\"tValues\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"28\" name=\"bValues\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"29\" name=\"tStop\" color=\"7\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"30\" name=\"bStop\" color=\"7\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"31\" name=\"tCream\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"32\" name=\"bCream\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"33\" name=\"tFinish\" color=\"6\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"34\" name=\"bFinish\" color=\"6\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"35\" name=\"tGlue\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"36\" name=\"bGlue\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"37\" name=\"tTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"38\" name=\"bTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"39\" name=\"tKeepout\" color=\"4\" fill=\"11\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"40\" name=\"bKeepout\" color=\"1\" fill=\"11\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"41\" name=\"tRestrict\" color=\"4\" fill=\"10\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"42\" name=\"bRestrict\" color=\"1\" fill=\"10\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"43\" name=\"vRestrict\" color=\"2\" fill=\"10\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"44\" name=\"Drills\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"45\" name=\"Holes\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"46\" name=\"Milling\" color=\"3\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"47\" name=\"Measures\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"48\" name=\"Document\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"49\" name=\"Reference\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"51\" name=\"tDocu\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"52\" name=\"bDocu\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"90\" name=\"Modules\" color=\"5\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"91\" name=\"Nets\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"92\" name=\"Busses\" color=\"1\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"93\" name=\"Pins\" color=\"2\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\n<layer number=\"94\" name=\"Symbols\" color=\"4\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"95\" name=\"Names\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"96\" name=\"Values\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"97\" name=\"Info\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<layer number=\"98\" name=\"Guide\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\n<\/layers>\n";
-  var tail = "<\/drawing>\n<\/eagle>\n";
+$("#downloadBrd").click(function() {
+  var head = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<!DOCTYPE eagle SYSTEM \"eagle.dtd\">\r\n<eagle version=\"7.7.0\">\r\n<drawing>\r\n<settings>\r\n<setting alwaysvectorfont=\"yes\"\/>\r\n<setting verticaltext=\"up\"\/>\r\n<\/settings>\r\n<grid distance=\"0.05\" unitdist=\"inch\" unit=\"inch\" style=\"lines\" multiple=\"1\" display=\"yes\" altdistance=\"0.005\" altunitdist=\"inch\" altunit=\"inch\"\/>\r\n<layers>\r\n<layer number=\"1\" name=\"Top\" color=\"4\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"2\" name=\"Route2\" color=\"1\" fill=\"3\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"3\" name=\"Route3\" color=\"4\" fill=\"3\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"4\" name=\"Route4\" color=\"1\" fill=\"4\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"5\" name=\"Route5\" color=\"4\" fill=\"4\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"6\" name=\"Route6\" color=\"1\" fill=\"8\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"7\" name=\"Route7\" color=\"4\" fill=\"8\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"8\" name=\"Route8\" color=\"1\" fill=\"2\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"9\" name=\"Route9\" color=\"4\" fill=\"2\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"10\" name=\"Route10\" color=\"1\" fill=\"7\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"11\" name=\"Route11\" color=\"4\" fill=\"7\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"12\" name=\"Route12\" color=\"1\" fill=\"5\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"13\" name=\"Route13\" color=\"4\" fill=\"5\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"14\" name=\"Route14\" color=\"1\" fill=\"6\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"15\" name=\"Route15\" color=\"4\" fill=\"6\" visible=\"no\" active=\"no\"\/>\r\n<layer number=\"16\" name=\"Bottom\" color=\"1\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"17\" name=\"Pads\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"18\" name=\"Vias\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"19\" name=\"Unrouted\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"20\" name=\"Dimension\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"21\" name=\"tPlace\" color=\"16\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"22\" name=\"bPlace\" color=\"14\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"23\" name=\"tOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"24\" name=\"bOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"25\" name=\"tNames\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"26\" name=\"bNames\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"27\" name=\"tValues\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"28\" name=\"bValues\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"29\" name=\"tStop\" color=\"7\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"30\" name=\"bStop\" color=\"7\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"31\" name=\"tCream\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"32\" name=\"bCream\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"33\" name=\"tFinish\" color=\"6\" fill=\"3\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"34\" name=\"bFinish\" color=\"6\" fill=\"6\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"35\" name=\"tGlue\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"36\" name=\"bGlue\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"37\" name=\"tTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"38\" name=\"bTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"39\" name=\"tKeepout\" color=\"4\" fill=\"11\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"40\" name=\"bKeepout\" color=\"1\" fill=\"11\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"41\" name=\"tRestrict\" color=\"4\" fill=\"10\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"42\" name=\"bRestrict\" color=\"1\" fill=\"10\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"43\" name=\"vRestrict\" color=\"2\" fill=\"10\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"44\" name=\"Drills\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"45\" name=\"Holes\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"46\" name=\"Milling\" color=\"3\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"47\" name=\"Measures\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"48\" name=\"Document\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"49\" name=\"Reference\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<layer number=\"51\" name=\"tDocu\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"\/>\r\n<layer number=\"52\" name=\"bDocu\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"\/>\r\n<\/layers>\r\n<board>\r\n<plain>";
+  var tail = "<\/plain>\r\n<libraries>\r\n<\/libraries>\r\n<attributes>\r\n<\/attributes>\r\n<variantdefs>\r\n<\/variantdefs>\r\n<classes>\r\n<class number=\"0\" name=\"default\" width=\"0\" drill=\"0\">\r\n<\/class>\r\n<\/classes>\r\n<designrules name=\"default\">\r\n<description language=\"en\">&lt;b&gt;EAGLE Design Rules&lt;\/b&gt;\r\n&lt;p&gt;\r\nThe default Design Rules have been set to cover\r\na wide range of applications. Your particular design\r\nmay have different requirements, so please make the\r\nnecessary adjustments and save your customized\r\ndesign rules under a new name.\r\n<\/description>\r\n<param name=\"layerSetup\" value=\"(1*16)\"\/>\r\n<param name=\"mtCopper\" value=\"0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm 0.035mm\"\/>\r\n<param name=\"mtIsolate\" value=\"1.5mm 0.15mm 0.2mm 0.15mm 0.2mm 0.15mm 0.2mm 0.15mm 0.2mm 0.15mm 0.2mm 0.15mm 0.2mm 0.15mm 0.2mm\"\/>\r\n<param name=\"mdWireWire\" value=\"8mil\"\/>\r\n<param name=\"mdWirePad\" value=\"8mil\"\/>\r\n<param name=\"mdWireVia\" value=\"8mil\"\/>\r\n<param name=\"mdPadPad\" value=\"8mil\"\/>\r\n<param name=\"mdPadVia\" value=\"8mil\"\/>\r\n<param name=\"mdViaVia\" value=\"8mil\"\/>\r\n<param name=\"mdSmdPad\" value=\"8mil\"\/>\r\n<param name=\"mdSmdVia\" value=\"8mil\"\/>\r\n<param name=\"mdSmdSmd\" value=\"8mil\"\/>\r\n<param name=\"mdViaViaSameLayer\" value=\"8mil\"\/>\r\n<param name=\"mnLayersViaInSmd\" value=\"2\"\/>\r\n<param name=\"mdCopperDimension\" value=\"40mil\"\/>\r\n<param name=\"mdDrill\" value=\"8mil\"\/>\r\n<param name=\"mdSmdStop\" value=\"0mil\"\/>\r\n<param name=\"msWidth\" value=\"10mil\"\/>\r\n<param name=\"msDrill\" value=\"0.6mm\"\/>\r\n<param name=\"msMicroVia\" value=\"9.99mm\"\/>\r\n<param name=\"msBlindViaRatio\" value=\"0.5\"\/>\r\n<param name=\"rvPadTop\" value=\"0.25\"\/>\r\n<param name=\"rvPadInner\" value=\"0.25\"\/>\r\n<param name=\"rvPadBottom\" value=\"0.25\"\/>\r\n<param name=\"rvViaOuter\" value=\"0.25\"\/>\r\n<param name=\"rvViaInner\" value=\"0.25\"\/>\r\n<param name=\"rvMicroViaOuter\" value=\"0.25\"\/>\r\n<param name=\"rvMicroViaInner\" value=\"0.25\"\/>\r\n<param name=\"rlMinPadTop\" value=\"10mil\"\/>\r\n<param name=\"rlMaxPadTop\" value=\"20mil\"\/>\r\n<param name=\"rlMinPadInner\" value=\"10mil\"\/>\r\n<param name=\"rlMaxPadInner\" value=\"20mil\"\/>\r\n<param name=\"rlMinPadBottom\" value=\"10mil\"\/>\r\n<param name=\"rlMaxPadBottom\" value=\"20mil\"\/>\r\n<param name=\"rlMinViaOuter\" value=\"8mil\"\/>\r\n<param name=\"rlMaxViaOuter\" value=\"20mil\"\/>\r\n<param name=\"rlMinViaInner\" value=\"8mil\"\/>\r\n<param name=\"rlMaxViaInner\" value=\"20mil\"\/>\r\n<param name=\"rlMinMicroViaOuter\" value=\"4mil\"\/>\r\n<param name=\"rlMaxMicroViaOuter\" value=\"20mil\"\/>\r\n<param name=\"rlMinMicroViaInner\" value=\"4mil\"\/>\r\n<param name=\"rlMaxMicroViaInner\" value=\"20mil\"\/>\r\n<param name=\"psTop\" value=\"-1\"\/>\r\n<param name=\"psBottom\" value=\"-1\"\/>\r\n<param name=\"psFirst\" value=\"-1\"\/>\r\n<param name=\"psElongationLong\" value=\"100\"\/>\r\n<param name=\"psElongationOffset\" value=\"100\"\/>\r\n<param name=\"mvStopFrame\" value=\"1\"\/>\r\n<param name=\"mvCreamFrame\" value=\"0\"\/>\r\n<param name=\"mlMinStopFrame\" value=\"4mil\"\/>\r\n<param name=\"mlMaxStopFrame\" value=\"4mil\"\/>\r\n<param name=\"mlMinCreamFrame\" value=\"0mil\"\/>\r\n<param name=\"mlMaxCreamFrame\" value=\"0mil\"\/>\r\n<param name=\"mlViaStopLimit\" value=\"0mil\"\/>\r\n<param name=\"srRoundness\" value=\"0\"\/>\r\n<param name=\"srMinRoundness\" value=\"0mil\"\/>\r\n<param name=\"srMaxRoundness\" value=\"0mil\"\/>\r\n<param name=\"slThermalIsolate\" value=\"10mil\"\/>\r\n<param name=\"slThermalsForVias\" value=\"0\"\/>\r\n<param name=\"dpMaxLengthDifference\" value=\"10mm\"\/>\r\n<param name=\"dpGapFactor\" value=\"2.5\"\/>\r\n<param name=\"checkGrid\" value=\"0\"\/>\r\n<param name=\"checkAngle\" value=\"0\"\/>\r\n<param name=\"checkFont\" value=\"1\"\/>\r\n<param name=\"checkRestrict\" value=\"1\"\/>\r\n<param name=\"useDiameter\" value=\"13\"\/>\r\n<param name=\"maxErrors\" value=\"999999\"\/>\r\n<\/designrules>\r\n<autorouter>\r\n<pass name=\"Default\">\r\n<param name=\"RoutingGrid\" value=\"50mil\"\/>\r\n<param name=\"AutoGrid\" value=\"1\"\/>\r\n<param name=\"Efforts\" value=\"0\"\/>\r\n<param name=\"TopRouterVariant\" value=\"1\"\/>\r\n<param name=\"tpViaShape\" value=\"round\"\/>\r\n<param name=\"PrefDir.1\" value=\"a\"\/>\r\n<param name=\"PrefDir.2\" value=\"0\"\/>\r\n<param name=\"PrefDir.3\" value=\"0\"\/>\r\n<param name=\"PrefDir.4\" value=\"0\"\/>\r\n<param name=\"PrefDir.5\" value=\"0\"\/>\r\n<param name=\"PrefDir.6\" value=\"0\"\/>\r\n<param name=\"PrefDir.7\" value=\"0\"\/>\r\n<param name=\"PrefDir.8\" value=\"0\"\/>\r\n<param name=\"PrefDir.9\" value=\"0\"\/>\r\n<param name=\"PrefDir.10\" value=\"0\"\/>\r\n<param name=\"PrefDir.11\" value=\"0\"\/>\r\n<param name=\"PrefDir.12\" value=\"0\"\/>\r\n<param name=\"PrefDir.13\" value=\"0\"\/>\r\n<param name=\"PrefDir.14\" value=\"0\"\/>\r\n<param name=\"PrefDir.15\" value=\"0\"\/>\r\n<param name=\"PrefDir.16\" value=\"a\"\/>\r\n<param name=\"cfVia\" value=\"8\"\/>\r\n<param name=\"cfNonPref\" value=\"5\"\/>\r\n<param name=\"cfChangeDir\" value=\"2\"\/>\r\n<param name=\"cfOrthStep\" value=\"2\"\/>\r\n<param name=\"cfDiagStep\" value=\"3\"\/>\r\n<param name=\"cfExtdStep\" value=\"0\"\/>\r\n<param name=\"cfBonusStep\" value=\"1\"\/>\r\n<param name=\"cfMalusStep\" value=\"1\"\/>\r\n<param name=\"cfPadImpact\" value=\"4\"\/>\r\n<param name=\"cfSmdImpact\" value=\"4\"\/>\r\n<param name=\"cfBusImpact\" value=\"0\"\/>\r\n<param name=\"cfHugging\" value=\"3\"\/>\r\n<param name=\"cfAvoid\" value=\"4\"\/>\r\n<param name=\"cfPolygon\" value=\"10\"\/>\r\n<param name=\"cfBase.1\" value=\"0\"\/>\r\n<param name=\"cfBase.2\" value=\"1\"\/>\r\n<param name=\"cfBase.3\" value=\"1\"\/>\r\n<param name=\"cfBase.4\" value=\"1\"\/>\r\n<param name=\"cfBase.5\" value=\"1\"\/>\r\n<param name=\"cfBase.6\" value=\"1\"\/>\r\n<param name=\"cfBase.7\" value=\"1\"\/>\r\n<param name=\"cfBase.8\" value=\"1\"\/>\r\n<param name=\"cfBase.9\" value=\"1\"\/>\r\n<param name=\"cfBase.10\" value=\"1\"\/>\r\n<param name=\"cfBase.11\" value=\"1\"\/>\r\n<param name=\"cfBase.12\" value=\"1\"\/>\r\n<param name=\"cfBase.13\" value=\"1\"\/>\r\n<param name=\"cfBase.14\" value=\"1\"\/>\r\n<param name=\"cfBase.15\" value=\"1\"\/>\r\n<param name=\"cfBase.16\" value=\"0\"\/>\r\n<param name=\"mnVias\" value=\"20\"\/>\r\n<param name=\"mnSegments\" value=\"9999\"\/>\r\n<param name=\"mnExtdSteps\" value=\"9999\"\/>\r\n<param name=\"mnRipupLevel\" value=\"10\"\/>\r\n<param name=\"mnRipupSteps\" value=\"100\"\/>\r\n<param name=\"mnRipupTotal\" value=\"100\"\/>\r\n<\/pass>\r\n<pass name=\"Follow-me\" refer=\"Default\" active=\"yes\">\r\n<\/pass>\r\n<pass name=\"Busses\" refer=\"Default\" active=\"yes\">\r\n<param name=\"cfNonPref\" value=\"4\"\/>\r\n<param name=\"cfBusImpact\" value=\"4\"\/>\r\n<param name=\"cfHugging\" value=\"0\"\/>\r\n<param name=\"mnVias\" value=\"0\"\/>\r\n<\/pass>\r\n<pass name=\"Route\" refer=\"Default\" active=\"yes\">\r\n<\/pass>\r\n<pass name=\"Optimize1\" refer=\"Default\" active=\"yes\">\r\n<param name=\"cfVia\" value=\"99\"\/>\r\n<param name=\"cfExtdStep\" value=\"10\"\/>\r\n<param name=\"cfHugging\" value=\"1\"\/>\r\n<param name=\"mnExtdSteps\" value=\"1\"\/>\r\n<param name=\"mnRipupLevel\" value=\"0\"\/>\r\n<\/pass>\r\n<pass name=\"Optimize2\" refer=\"Optimize1\" active=\"yes\">\r\n<param name=\"cfNonPref\" value=\"0\"\/>\r\n<param name=\"cfChangeDir\" value=\"6\"\/>\r\n<param name=\"cfExtdStep\" value=\"0\"\/>\r\n<param name=\"cfBonusStep\" value=\"2\"\/>\r\n<param name=\"cfMalusStep\" value=\"2\"\/>\r\n<param name=\"cfPadImpact\" value=\"2\"\/>\r\n<param name=\"cfSmdImpact\" value=\"2\"\/>\r\n<param name=\"cfHugging\" value=\"0\"\/>\r\n<\/pass>\r\n<pass name=\"Optimize3\" refer=\"Optimize2\" active=\"yes\">\r\n<param name=\"cfChangeDir\" value=\"8\"\/>\r\n<param name=\"cfPadImpact\" value=\"0\"\/>\r\n<param name=\"cfSmdImpact\" value=\"0\"\/>\r\n<\/pass>\r\n<pass name=\"Optimize4\" refer=\"Optimize3\" active=\"yes\">\r\n<param name=\"cfChangeDir\" value=\"25\"\/>\r\n<\/pass>\r\n<\/autorouter>\r\n<elements>\r\n<\/elements>\r\n<signals>\r\n<\/signals>\r\n<\/board>\r\n<\/drawing>\r\n<\/eagle>";
 
-  var lbrFile = head + "<library>\n<packages>\n";
-
-  // Write packages
-
-  $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<package name=\"" + this.dataset.text.toUpperCase() + "\">\n";
-    lbrFile += this.dataset.eagle;
-    lbrFile += "</package>\n";
-  });
-  lbrFile += "</packages>\n<symbols>\n";
-
-  // Write symbols
-  $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<symbol name=\"" + this.dataset.text.toUpperCase() + "\">\n";
-    lbrFile += "<text x=\"-2.54\" y=\"0\" size=\"1.778\" layer=\"94\">" + this.dataset.text + "<\/text>\n<\/symbol>\n";
-  });
-  lbrFile += "</symbols>\n<devicesets>\n";
-
-  // Write devicesets
-  $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<deviceset name=\"" + this.dataset.text.toUpperCase() + "\">\n";
-    lbrFile += "<gates>\n<gate name=\"G$1\" symbol=\"" + this.dataset.text.toUpperCase() + "\" x=\"0\" y=\"0\"\/>\n<\/gates>\n<devices>\n";
-    lbrFile += "<device name=\"\" package=\"" + this.dataset.text.toUpperCase() + "\">\n<technologies>\n<technology name=\"\"\/>\n<\/technologies>\n<\/device>\n<\/devices>\n<\/deviceset>\n";
-  });
-  lbrFile += "<\/devicesets>\n<\/library>\n";
-
-  lbrFile += tail;
-
-  var filename = "buzzard_labels.lbr";
+  var brdFile = head + document.getElementById("output").value + tail;
+  var filename = document.getElementById("labelText").value + ".brd";
 
 
-  var blob = new Blob([lbrFile], {
+  var blob = new Blob([brdFile], {
     type: "text/plain;charset=utf-8"
   });
-  saveAs(blob, filename, true);
-
-  $("#labelGroup").find(".popLabel").trigger("click");
-
+  saveAs(blob, filename);
 });
 
-$("#labelGroup").on('click', ".popLabel", function(e) {
-  selectPop(e);
-});
+function appendLib() {
 
-$("#labelGroup").on('mouseover', ".popLabel", function(e) {
-  showDeleteButton(e);
-});
 
-$("#labelGroup").on('mouseout', ".popLabel", function(e) {
-  hideDeleteButton(e);
-});
 
-$("#labelGroup").on('mouseout', ".deleteButton", function(e) {
-  hideDeleteButton(e);
-});
 
-$("#labelGroup").on('click', ".deleteButton", function(e) {
-  deletePop(e);
-});
-
-function popLabel() {
-  if (document.getElementById("labelText").value.slice(-1) == "," && document.getElementById("labelText").value.substr(0, document.getElementById("labelText").value.indexOf(",")) != "") {
-    var newLabel = document.getElementById("labelText").value.substr(0, document.getElementById("labelText").value.indexOf(","));
-    document.getElementById("labelText").value = "";
-    var labelTag = document.createElement("div");
-    labelTag.classList.add("popLabel");
-    labelTag.setAttribute("id", "pop_" + newLabel);
-    labelTag.innerHTML = newLabel;
-    var deleteButton = document.createElement("div");
-    deleteButton.innerHTML = "-";
-    deleteButton.classList.add("deleteButton");
-    $(deleteButton).hide();
-    labelTag.appendChild(deleteButton);
-
-    labelTag.setAttribute("data-text", newLabel);
-    labelTag.setAttribute("data-font", document.getElementById("labelFont").value);
-    labelTag.setAttribute("data-font-size", document.getElementById("fontSize").value);
-    labelTag.setAttribute("data-font-offset", document.getElementById("fontOffsetV").value);
-    labelTag.setAttribute("data-lcap", document.getElementById("leftCapStyle").value);
-    labelTag.setAttribute("data-rcap", document.getElementById("rightCapStyle").value);
-    labelTag.setAttribute("data-threshold", document.getElementById("sharpness").value);
-    labelTag.setAttribute("data-scale", document.getElementById("scaleFactor").value);
-    labelTag.setAttribute("data-eagle", document.getElementById("output").value);
-
-    document.getElementById("labelGroup").appendChild(labelTag);
-    setDefaults();
-  }
-
-  drawLabel();
-}
-
-function selectPop(popLabel) {
-
-  document.getElementById("labelText").value = document.getElementById("labelText").value + ",";
-
-  $("#labelText").trigger("keyup");
-
-  label = popLabel.target;
-  console.log(label);
-  document.getElementById("labelText").value = label.dataset.text;
-  document.getElementById("labelFont").value = label.dataset.font;
-  document.getElementById("fontSize").value = label.dataset.fontSize;
-  document.getElementById("fontOffsetV").value = label.dataset.fontOffset;
-  document.getElementById("leftCapStyle").value = label.dataset.lcap;
-  document.getElementById("rightCapStyle").value = label.dataset.rcap;
-  document.getElementById("sharpness").value = label.dataset.threshold;
-  document.getElementById("scaleFactor").value = label.dataset.scale;
-  document.getElementById("output").value = label.dataset.eagle;
-
-  $popLabel = jQuery(popLabel.target);
-  $popLabel.closest(".popLabel").remove();
-
-  loadFont();
-
-}
-
-function deletePop(popLabel) {
-  popLabel.stopPropagation();
-  $popLabel = jQuery(popLabel.target);
-  $popLabel.closest(".popLabel").remove();
-}
-
-function showDeleteButton(popLabel) {
-  $popLabel = jQuery(popLabel.target);
-  $popLabel.find(".deleteButton").show();
-}
-
-function hideDeleteButton(popLabel) {
-  $popLabel = jQuery(popLabel.target);
-  if ($popLabel.find(".deleteButton")[0] != undefined) {
-    if ($popLabel.find(":hover")[0] != $popLabel.find(".deleteButton")[0]) {
-      $popLabel.find(".deleteButton").hide();
-    }
-  } else {
-    $popLabel.closest(".deleteButton").hide();
-  }
-}
-
-function setDefaults() {
-  document.getElementById("labelText").value = "";
-  document.getElementById("labelFont").value = "Fredoka One";
-  document.getElementById("fontSize").value = "36";
-  document.getElementById("fontOffsetV").value = "7";
-  document.getElementById("leftCapStyle").value = "rounded";
-  document.getElementById("rightCapStyle").value = "rounded";
-  document.getElementById("sharpness").value = "650";
-  document.getElementById("scaleFactor").value = "0.06";
 }

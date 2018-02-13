@@ -19,7 +19,7 @@
 
 <body>
 <div id="navHeader">
-  <img src="https://github.com/sparkfunX/Buzzard/raw/master/logo-1-gray.png" width="40px" height="40px" id="logo">
+  <img src="/logo-1-gray.png" width="40px" height="40px" id="logo">
   <span id="title">BUZZARD</span>
   <span id="subtitle">EAGLE Utilities</span>
   <a href="https://github.com/sparkfunX/Buzzard/wiki/Getting-Started" id="docsLink">Docs</a>
@@ -33,11 +33,7 @@
       <div id="labelMakerTab" class="tab selected">
         Label Maker
       </div>
-      
-      <div id="BarcodeMakerTab" class="tab unselected">
-        Barcode Maker
-      </div>
-      
+
       <div id="padDesignerTab" class="tab unselected">
         Pad Designer
       </div>
@@ -63,8 +59,6 @@
     <span class="ctlLabel">Label Text</span>
     <input type="text" id="labelText" value="GND">
     <br>
-    <div id="labelGroup">
-    </div>
     <span class="ctlLabel">Label Font</span>
     <select id="labelFont" class="input">
       <option value="Bree Serif">Bree Serif</option>
@@ -114,7 +108,14 @@
     <br>
     <span id="realSize"></span>
     <br>
-    <input type="button" value="Download EAGLE Library" id="downloadLib">
+    <input type="button" value="Download EAGLE Board File" id="downloadBrd">
+    <br>
+    <br>
+    <span class="ctlLabel">Append to EAGLE Library</span>
+    <br>
+    <input type="file" value="Append to EAGLE Library" id="appendLib" accept=".lbr">
+    <br>
+    <input type="button" value="Download Appended Library" id="downloadLib" disabled>
     <br>
     <br>
     <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
@@ -123,9 +124,8 @@
     <input type="checkbox" value="Show XML" id="showXML">
     <label class="ctlLabel" id="showxml_label" for="showXML">Show XML</label>
   </div>
-  <br>
-  <textarea id="output" style="visibility: hidden;"></textarea>
 </div>
+<textarea id="output" style="visibility: hidden;"></textarea>
 <script src="js/logic.js"></script>
 </body>
 </html>
