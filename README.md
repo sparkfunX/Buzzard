@@ -1,5 +1,5 @@
 # Buzzard
-<img src="https://github.com/sparkfunX/Buzzard/raw/master/logo-1.png" height="100px" width="100px">
+<img src="https://github.com/sparkfunX/Buzzard/raw/master/logo-1-gray.png" height="100px" width="100px">
 <br/>
 Web-based tools for EAGLE silkscreen and library management
 <br/>
