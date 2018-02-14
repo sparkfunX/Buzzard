@@ -299,7 +299,7 @@ $("#downloadLib").click(function() {
   // Write packages
 
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<package name=\"" + this.dataset.text.toUpperCase() + "\">\n";
+    lbrFile += "<package name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
     lbrFile += this.dataset.eagle;
     lbrFile += "</package>\n";
   });
@@ -307,16 +307,16 @@ $("#downloadLib").click(function() {
 
   // Write symbols
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<symbol name=\"" + this.dataset.text.toUpperCase() + "\">\n";
+    lbrFile += "<symbol name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
     lbrFile += "<text x=\"-2.54\" y=\"0\" size=\"1.778\" layer=\"94\">" + this.dataset.text + "<\/text>\n<\/symbol>\n";
   });
   lbrFile += "</symbols>\n<devicesets>\n";
 
   // Write devicesets
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<deviceset name=\"" + this.dataset.text.toUpperCase() + "\">\n";
-    lbrFile += "<gates>\n<gate name=\"G$1\" symbol=\"" + this.dataset.text.toUpperCase() + "\" x=\"0\" y=\"0\"\/>\n<\/gates>\n<devices>\n";
-    lbrFile += "<device name=\"\" package=\"" + this.dataset.text.toUpperCase() + "\">\n<technologies>\n<technology name=\"\"\/>\n<\/technologies>\n<\/device>\n<\/devices>\n<\/deviceset>\n";
+    lbrFile += "<deviceset name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
+    lbrFile += "<gates>\n<gate name=\"G$1\" symbol=\"" + cleanName(this.dataset.text.toUpperCase()) + "\" x=\"0\" y=\"0\"\/>\n<\/gates>\n<devices>\n";
+    lbrFile += "<device name=\"\" package=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n<technologies>\n<technology name=\"\"\/>\n<\/technologies>\n<\/device>\n<\/devices>\n<\/deviceset>\n";
   });
   lbrFile += "<\/devicesets>\n<\/library>\n";
 
@@ -441,4 +441,14 @@ function setDefaults() {
   document.getElementById("rightCapStyle").value = "rounded";
   document.getElementById("sharpness").value = "650";
   document.getElementById("scaleFactor").value = "0.06";
+}
+
+function cleanName(name) {
+
+	console.log(name);
+  name = name.replace(/ /g, '_');
+	name = name.replace(/\W/g, '#');
+  console.log(name);
+  return name;
+
 }
