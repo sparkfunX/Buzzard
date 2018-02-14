@@ -308,7 +308,7 @@ $("#downloadLib").click(function() {
   // Write symbols
   $("#labelGroup").children(".popLabel").each(function(index) {
     lbrFile += "<symbol name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
-    lbrFile += "<text x=\"-2.54\" y=\"0\" size=\"1.778\" layer=\"94\">" + this.dataset.text + "<\/text>\n<\/symbol>\n";
+    lbrFile += "<text x=\"0\" y=\"0\" size=\"1.778\" layer=\"94\">" + cleanName(this.dataset.text) + "<\/text>\n<\/symbol>\n";
   });
   lbrFile += "</symbols>\n<devicesets>\n";
 
