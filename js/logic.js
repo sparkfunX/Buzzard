@@ -5,6 +5,7 @@ ctx.canvas.width = 405;
 ctx.canvas.height = 405;
 ctx.font = "36px Fredoka One"
 var popCount = 0;
+var adjOffset = document.getElementById("fontOffsetV").value;
 
 function drawLabel() {
 
@@ -21,6 +22,8 @@ function drawLabel() {
 
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  adjOffset = document.getElementById("fontOffsetV").value;
+  
   ctx.fillStyle = "black";
 
   ctx.fillRect(((ctx.canvas.width / 2) -
@@ -28,7 +31,7 @@ function drawLabel() {
 
   ctx.fillStyle = "white";
 
-  ctx.fillText(removeBang(document.getElementById("labelText").value), ((ctx.canvas.width / 2) - (ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - document.getElementById("fontOffsetV").value)
+  ctx.fillText(removeBang(document.getElementById("labelText").value), ((ctx.canvas.width / 2) - (ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - adjOffset)
 
 	barOverBang(document.getElementById("labelText").value);
 	
@@ -544,6 +547,7 @@ for(var j = 1; j<string.length; j++){
 	for(var i = 0; i<string.length; i++){
   	if(string.charAt(i) == "!"){
     	// remove bang
+      fontShrink();
    		string = string.slice(0,i) + string.slice(i+1);
       	while(string.charAt(i) != "!"){
         	if(i == string.length - 1){
@@ -553,6 +557,8 @@ for(var j = 1; j<string.length; j++){
       // remove bang
       if(string.charAt(i)=="!"){
       string = string.slice(0,i) + string.slice(i+1);}
+    }else{
+    fontUnshrink();
     }
   }
   
@@ -564,4 +570,20 @@ for(var j = 1; j<string.length; j++){
   
   console.log("Returning \"" + string + "\"");
   return string; 
+}
+
+function fontShrink() {
+
+  var fontString = (document.getElementById("fontSize").value-6) + "px " + document.getElementById("labelFont").value;
+  ctx.font = fontString;
+  
+  adjOffset = document.getElementById("fontOffsetV").value -2;
+
+}
+
+function fontUnshrink() {
+
+  var fontString = document.getElementById("fontSize").value + "px " + document.getElementById("labelFont").value;
+  ctx.font = fontString;
+
 }
