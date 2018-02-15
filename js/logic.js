@@ -191,7 +191,7 @@ function eaglify() {
 
         // ...and previous pixel was white
         if (prevPx > 128) {
-          outString += "<rectangle x1=\"" + dectwo(j * scaleFactor) + "\" y1=\"" + dectwo(i * (0 - scaleFactor)) + "\" ";
+          outString += "<rectangle x1=\"" + dectwo(j * scaleFactor) + "\" y1=\"" + dectwo((i * (0 - scaleFactor))+0.5*(fixedHeight*scaleFactor)) + "\" ";
         } else { // ...and previous pixel was black
           // do nothing, keep cruising
         }
@@ -202,7 +202,7 @@ function eaglify() {
         if (prevPx > 128) {
           // do nothing, keep cruising
         } else { // ...and previous pixel was black
-          outString += "x2=\"" + dectwo(j * scaleFactor) + "\" y2=\"" + dectwo(i * (0 - scaleFactor) - scaleFactor) + "\" layer=\"21\"/>\n";
+          outString += "x2=\"" + dectwo(j * scaleFactor) + "\" y2=\"" + dectwo((i * (0 - scaleFactor) - scaleFactor)+0.5*(fixedHeight*scaleFactor)) + "\" layer=\"21\"/>\n";
         }
 
       }
