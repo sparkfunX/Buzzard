@@ -24,12 +24,14 @@ function drawLabel() {
   ctx.fillStyle = "black";
 
   ctx.fillRect(((ctx.canvas.width / 2) -
-    ctx.measureText(document.getElementById("labelText").value).width / 2) - 1, (ctx.canvas.height / 2) - fixedHeight / 2, ctx.measureText(document.getElementById("labelText").value).width + 2, fixedHeight);
+    ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2) - 1, (ctx.canvas.height / 2) - fixedHeight / 2, ctx.measureText(removeBang(document.getElementById("labelText").value)).width + 2, fixedHeight);
 
   ctx.fillStyle = "white";
 
-  ctx.fillText(document.getElementById("labelText").value, ((ctx.canvas.width / 2) - (ctx.measureText(document.getElementById("labelText").value).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - document.getElementById("fontOffsetV").value)
+  ctx.fillText(removeBang(document.getElementById("labelText").value), ((ctx.canvas.width / 2) - (ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - document.getElementById("fontOffsetV").value)
 
+	barOverBang(document.getElementById("labelText").value);
+	
   var leftCap = new Image();
   switch (document.getElementById("leftCapStyle").value) {
 
@@ -451,4 +453,115 @@ function cleanName(name) {
   console.log(name);
   return name;
 
+}
+
+function barOverBang(string){
+
+//bail before things get weird
+if(string.length<2){return string;}
+
+		console.log("bang check on \"" + string + "\"...")
+
+	var barStart;
+  var barStop;
+  
+for(var j = 1; j<string.length; j++){
+  	if(string.charAt(string.length-j) == "!"){
+    	string = string.slice(0,string.length-j) + "ǃ" + string.slice(string.length-j+1);
+    }else{
+    	break;
+    }
+  }
+
+	for(var i = 0; i<string.length; i++){
+  	if(string.charAt(i) == "!"){
+      console.log("...found one...")
+    	// remove bang
+   		string = string.slice(0,i) + string.slice(i+1);
+    	barStart = ctx.measureText(string.slice(0,i)).width + (ctx.canvas.width / 2) -
+    ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2 + 2;
+      	while(string.charAt(i) != "!"){
+        	if(i == string.length - 1){
+          	i++;
+          	console.log("...line end...")
+            break;}
+          i++;
+        }
+      console.log("...found mate...")
+      // remove bang
+      if(string.charAt(i)=="!"){
+      string = string.slice(0,i) + string.slice(i+1);}
+      barStop = ctx.measureText(string.slice(0,i)).width + (ctx.canvas.width / 2) -
+    ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2 - 3;
+      drawBar(barStart, barStop);
+    }
+  }  
+  
+      for(var k = 0; k<string.length; k++){
+  	if(string.charAt(k) == "ǃ"){
+    	string = string.slice(0,k) + "!" + string.slice(k+1);
+    }
+    
+  }
+  
+}
+
+function drawBar(start, stop){
+
+	var canvas = document.getElementById("labelCanvas");
+	var ctx = canvas.getContext("2d");
+
+	var barMargin = 7;
+	var barHeight = (ctx.canvas.height / 2) - (fixedHeight / 2) + barMargin; 
+  
+  console.log("Drawing bar from (" + start + "," + barHeight + ") to (" + stop + "," + barHeight + ")");
+
+  ctx.beginPath();
+  ctx.moveTo(start, barHeight);
+  ctx.lineTo(stop, barHeight);
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+}
+
+function removeBang(string){
+
+//bail before things get weird
+if(string.length<2){return string;}
+
+		console.log("bang remove on \"" + string + "\"...")
+    
+for(var j = 1; j<string.length; j++){
+  	if(string.charAt(string.length-j) == "!"){
+    	string = string.slice(0,string.length-j) + "ǃ" + string.slice(string.length-j+1);
+    }else{
+    	break;
+    }
+  }
+
+	for(var i = 0; i<string.length; i++){
+  	if(string.charAt(i) == "!"){
+    	// remove bang
+   		string = string.slice(0,i) + string.slice(i+1);
+      	while(string.charAt(i) != "!"){
+        	if(i == string.length - 1){
+            break;}
+          i++;
+        }
+      // remove bang
+      if(string.charAt(i)=="!"){
+      string = string.slice(0,i) + string.slice(i+1);}
+    }
+  }
+  
+    for(var k = 0; k<string.length; k++){
+  	if(string.charAt(k) == "ǃ"){
+    	string = string.slice(0,k) + "!" + string.slice(k+1);
+    }
+  }
+  
+  console.log("Returning \"" + string + "\"");
+  return string; 
 }
