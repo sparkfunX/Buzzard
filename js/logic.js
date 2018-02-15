@@ -22,9 +22,9 @@ function drawLabel() {
 
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  adjOffset = document.getElementById("fontOffsetV").value;
   
   ctx.fillStyle = "black";
+  adjOffset = document.getElementById("fontOffsetV").value;
 
   ctx.fillRect(((ctx.canvas.width / 2) -
     ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2) - 1, (ctx.canvas.height / 2) - fixedHeight / 2, ctx.measureText(removeBang(document.getElementById("labelText").value)).width + 2, fixedHeight);
@@ -34,7 +34,7 @@ function drawLabel() {
   ctx.fillText(removeBang(document.getElementById("labelText").value), ((ctx.canvas.width / 2) - (ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - adjOffset)
 
 	barOverBang(document.getElementById("labelText").value);
-	
+
   var leftCap = new Image();
   switch (document.getElementById("leftCapStyle").value) {
 
@@ -87,12 +87,12 @@ function drawLabel() {
 
   leftCap.onload = function() {
     ctx.drawImage(leftCap, ((ctx.canvas.width / 2) -
-      ctx.measureText(document.getElementById("labelText").value).width / 2) - 20, (ctx.canvas.height / 2) - fixedHeight / 2, 20, fixedHeight);
+      ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2) - 20, (ctx.canvas.height / 2) - fixedHeight / 2, 20, fixedHeight);
   }
 
   rightCap.onload = function() {
     ctx.drawImage(rightCap, ((ctx.canvas.width / 2) +
-      ctx.measureText(document.getElementById("labelText").value).width / 2), (ctx.canvas.height / 2) - fixedHeight / 2, 20, fixedHeight);
+      ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2), (ctx.canvas.height / 2) - fixedHeight / 2, 20, fixedHeight);
   }
 
   setTimeout(function() {
@@ -135,7 +135,7 @@ document.getElementById("fontSize").onchange = loadFont;
 document.getElementById("sharpness").onchange = drawLabel;
 document.getElementById("leftCapStyle").onchange = drawLabel;
 document.getElementById("rightCapStyle").onchange = drawLabel;
-document.getElementById("fontOffsetV").onchange = drawLabel;
+document.getElementById("fontOffsetV").onkeyup = drawLabel;
 document.getElementById("scaleFactor").onchange = drawLabel;
 document.getElementById("labelText").onkeyup = popLabel;
 document.getElementById("showXML").onchange = function() {
