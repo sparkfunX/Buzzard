@@ -248,6 +248,12 @@ document.getElementById("realHeight").onkeyup = scaleFromH;
 function updateLayers() {
 
   sizeCanvases();
+  
+  if(document.getElementById("silkLyr").checked == true && document.getElementById("maskLyr").checked == false && document.getElementById("copperLyr").checked == false){
+	document.getElementById("canvasGroup").style.backgroundColor = document.getElementById("maskColor").value;
+  }else{
+	document.getElementById("canvasGroup").style.backgroundColor = "#fcfc94";
+  }
 
   silkColor = document.getElementById("silkColor").value;
   maskColor = document.getElementById("maskColor").value;
