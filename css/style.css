@@ -17,6 +17,12 @@ body {
   border-color: black;
 }
 
+#viewportCanvas {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+}
+
 #controlWindow {
   float: left;
   margin-top: 20px;
