@@ -1,12 +1,8 @@
 var canvas = document.getElementById("labelCanvas");
 var ctx = canvas.getContext("2d");
-var viewport = document.getElementById("viewportCanvas");
-var viewportctx = viewport.getContext("2d");
 var fixedHeight = 41;
-ctx.canvas.width = 999;
-ctx.canvas.height = 999;
-viewport.width = 405;
-viewport.height = 405;
+ctx.canvas.width = 405;
+ctx.canvas.height = 405;
 ctx.font = "36px Fredoka One"
 var popCount = 0;
 var adjOffset = document.getElementById("fontOffsetV").value;
@@ -106,7 +102,6 @@ function drawLabel() {
     if (document.getElementById("invertCanvasCheck").checked == true) {
       invertCanvas();
     }
-    updateViewport();
   }, 100);
 
 }
@@ -192,7 +187,6 @@ function eaglify() {
   for (var i = 0; i < imgData.height; i++) {
 
     var prevPx = 255;
-    var tagOpen = false;
 
     // for each pixel in the row
     for (var j = 0; j < imgData.width; j++) {
@@ -202,7 +196,6 @@ function eaglify() {
 
         // ...and previous pixel was white
         if (prevPx > 128) {
-        	tagOpen = true;
           outString += "<rectangle x1=\"" + dectwo(j * scaleFactor) + "\" y1=\"" + dectwo((i * (0 - scaleFactor))+0.5*(fixedHeight*scaleFactor)) + "\" ";
         } else { // ...and previous pixel was black
           // do nothing, keep cruising
@@ -214,7 +207,6 @@ function eaglify() {
         if (prevPx > 128) {
           // do nothing, keep cruising
         } else { // ...and previous pixel was black
-        	tagOpen = false;
           outString += "x2=\"" + dectwo(j * scaleFactor) + "\" y2=\"" + dectwo((i * (0 - scaleFactor) - scaleFactor)+0.5*(fixedHeight*scaleFactor)) + "\" layer=\"21\"/>\n";
         }
 
@@ -223,11 +215,7 @@ function eaglify() {
       prevPx = imgData.data[(i * imgData.width * 4) + (j * 4)];
 
     }
-        
-    //check if last tag was open, close it with corner at width of picture
-    if (tagOpen == true) {
-      outString += "x2=\"" + dectwo(j * scaleFactor) + "\" y2=\"" + dectwo((i * (0 - scaleFactor) - scaleFactor)+0.5*(fixedHeight*scaleFactor)) + "\" layer=\"21\"/>\n";
-    }
+
 
   }
 
@@ -396,7 +384,7 @@ function popLabel() {
     labelTag.setAttribute("data-eagle", document.getElementById("output").value);
 
     document.getElementById("labelGroup").appendChild(labelTag);
-    //setDefaults();
+    setDefaults();
   }
 
   drawLabel();
@@ -597,26 +585,5 @@ function fontUnshrink() {
 
   var fontString = document.getElementById("fontSize").value + "px " + document.getElementById("labelFont").value;
   ctx.font = fontString;
-
-}
-
-function updateViewport() {
-
-var canvas = document.getElementById("labelCanvas");
-var ctx = canvas.getContext("2d");
-var viewport = document.getElementById("viewportCanvas");
-var viewportctx = viewport.getContext("2d");
-var scalingCanvas = document.getElementById("scalingCanvas");
-var scalingctx = scalingCanvas.getContext("2d");
-var imgData = ctx.getImageData(((ctx.canvas.width / 2) - ctx.measureText(document.getElementById("labelText").value).width / 2) - 22, ((ctx.canvas.width / 2) - ctx.measureText(document.getElementById("labelText").value).width / 2) - 22, ctx.measureText(document.getElementById("labelText").value).width + 46, ctx.measureText(document.getElementById("labelText").value).width + 46);
-    
- scalingCanvas.width = imgData.width;
- scalingCanvas.height = imgData.height;
- scalingctx.putImageData(imgData, 0,0);
-
- viewport.width = 405;
- viewport.height = 405;
-
- viewportctx.drawImage(scalingCanvas,0,0,scalingCanvas.width,scalingCanvas.height,50,50,viewport.width-100, viewport.height-100);
 
 }
