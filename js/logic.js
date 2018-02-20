@@ -312,28 +312,36 @@ $("#downloadLib").click(function() {
   var tail = "<\/drawing>\n<\/eagle>\n";
 
   var lbrFile = head + "<library>\n<packages>\n";
+  var serialNum = 0;
 
   // Write packages
 
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<package name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
+    lbrFile += "<package name=\"" + cleanName(this.dataset.text.toUpperCase()) + serialNum +  "\">\n";
     lbrFile += this.dataset.eagle;
     lbrFile += "</package>\n";
+    serialNum++;
   });
   lbrFile += "</packages>\n<symbols>\n";
 
+	serialNum = 0;
+
   // Write symbols
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<symbol name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
+    lbrFile += "<symbol name=\"" + cleanName(this.dataset.text.toUpperCase()) + serialNum + "\">\n";
     lbrFile += "<text x=\"0\" y=\"0\" size=\"1.778\" layer=\"94\">" + cleanName(this.dataset.text) + "<\/text>\n<\/symbol>\n";
+    serialNum++;
   });
   lbrFile += "</symbols>\n<devicesets>\n";
 
+	serialNum = 0;
+
   // Write devicesets
   $("#labelGroup").children(".popLabel").each(function(index) {
-    lbrFile += "<deviceset name=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n";
-    lbrFile += "<gates>\n<gate name=\"G$1\" symbol=\"" + cleanName(this.dataset.text.toUpperCase()) + "\" x=\"0\" y=\"0\"\/>\n<\/gates>\n<devices>\n";
-    lbrFile += "<device name=\"\" package=\"" + cleanName(this.dataset.text.toUpperCase()) + "\">\n<technologies>\n<technology name=\"\"\/>\n<\/technologies>\n<\/device>\n<\/devices>\n<\/deviceset>\n";
+    lbrFile += "<deviceset name=\"" + cleanName(this.dataset.text.toUpperCase()) + serialNum + "\">\n";
+    lbrFile += "<gates>\n<gate name=\"G$1\" symbol=\"" + cleanName(this.dataset.text.toUpperCase()) + serialNum + "\" x=\"0\" y=\"0\"\/>\n<\/gates>\n<devices>\n";
+    lbrFile += "<device name=\"\" package=\"" + cleanName(this.dataset.text.toUpperCase()) + serialNum + "\">\n<technologies>\n<technology name=\"\"\/>\n<\/technologies>\n<\/device>\n<\/devices>\n<\/deviceset>\n";
+    serialNum++;
   });
   lbrFile += "<\/devicesets>\n<\/library>\n";
 
