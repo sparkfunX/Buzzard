@@ -471,7 +471,14 @@ function selectPop(popLabel) {
   document.getElementById("output").value = label.dataset.eagle;
   if(label.dataset.textOnly == 1){
   document.getElementById("textOnlyMode").checked = true;
+  document.getElementById("leftCapStyle").disabled = true;
+  document.getElementById("rightCapStyle").disabled = true;  
   textOnlyFlag = 1;  
+  }else{
+  document.getElementById("textOnlyMode").checked = false;
+  document.getElementById("leftCapStyle").disabled = false;
+  document.getElementById("rightCapStyle").disabled = false;  
+  textOnlyFlag = 0;	  	  
   }
 
   $popLabel = jQuery(popLabel.target);
