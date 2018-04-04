@@ -10,6 +10,7 @@ viewport.height = 405;
 ctx.font = "36px Fredoka One"
 var popCount = 0;
 var adjOffset = document.getElementById("fontOffsetV").value;
+var textOnlyFlag = 0;
 
 function drawLabel() {
 
@@ -26,20 +27,23 @@ function drawLabel() {
 
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  
-  ctx.fillStyle = "black";
+  if(!textOnlyFlag){
+  ctx.fillStyle = "black";}else{ctx.fillStyle = "white";}
+
   adjOffset = document.getElementById("fontOffsetV").value;
 
   ctx.fillRect(((ctx.canvas.width / 2) -
     ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2) - 1, (ctx.canvas.height / 2) - fixedHeight / 2, ctx.measureText(removeBang(document.getElementById("labelText").value)).width + 2, fixedHeight);
 
-  ctx.fillStyle = "white";
+  if(!textOnlyFlag){	
+  ctx.fillStyle = "white";}else{ctx.fillStyle = "black";}
 
   ctx.fillText(removeBang(document.getElementById("labelText").value), ((ctx.canvas.width / 2) - (ctx.measureText(removeBang(document.getElementById("labelText").value)).width / 2)), (ctx.canvas.height / 2) + fixedHeight / 2 - adjOffset)
 
 	barOverBang(document.getElementById("labelText").value);
 
   var leftCap = new Image();
+  if(!textOnlyFlag){
   switch (document.getElementById("leftCapStyle").value) {
 
     case "square":
@@ -67,8 +71,12 @@ function drawLabel() {
       break;
 
   }
-
+  }else{
+  leftcap.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAoCAYAAAD+MdrbAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAApSURBVEiJ7cxBAQAABAQw9O98SvjZAqyTpA7NZSYUCoVCoVAoFAo/hgttXgRMlX31oAAAAABJRU5ErkJggg=="; 
+  }	
+	
   var rightCap = new Image();
+  if(!textOnlyFlag){  
   switch (document.getElementById("rightCapStyle").value) {
 
     case "square":
@@ -96,6 +104,9 @@ function drawLabel() {
       break;	  
 
   }
+  }else{
+  rightCap.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAoCAYAAAD+MdrbAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAApSURBVEiJ7cxBAQAABAQw9O98SvjZAqyTpA7NZSYUCoVCoVAoFAo/hgttXgRMlX31oAAAAABJRU5ErkJggg=="; 
+  }	
 
   leftCap.onload = function() {
     ctx.drawImage(leftCap, ((ctx.canvas.width / 2) -
@@ -151,6 +162,7 @@ document.getElementById("rightCapStyle").onchange = drawLabel;
 document.getElementById("fontOffsetV").onkeyup = drawLabel;
 document.getElementById("scaleFactor").onchange = drawLabel;
 document.getElementById("labelText").onkeyup = popLabel;
+document.getElementById("textOnlyMode").onchange = noBorderMode;
 document.getElementById("showXML").onchange = function() {
 
   if (document.getElementById("showXML").checked == false) {
@@ -165,6 +177,24 @@ drawLabel();
 setTimeout(function() {
   drawLabel();
 }, 1000);
+
+function noBorderMode() {
+	
+  if(document.getElementById("textOnlyMode").checked == true){
+  document.getElementById("leftCapStyle").value = "square";
+  document.getElementById("rightCapStyle").value = "square";
+  document.getElementById("leftCapStyle").disabled = true;
+  document.getElementById("rightCapStyle").disabled = true;
+  textOnlyFlag = 1;
+  }else{
+  document.getElementById("leftCapStyle").disabled = false;
+  document.getElementById("rightCapStyle").disabled = false;
+  textOnlyFlag = 0;	    
+  }
+  
+  drawLabel();
+	
+}
 
 function invertCanvas() {
 
