@@ -440,7 +440,10 @@ function popLabel() {
     labelTag.setAttribute("data-threshold", document.getElementById("sharpness").value);
     labelTag.setAttribute("data-scale", document.getElementById("scaleFactor").value);
     labelTag.setAttribute("data-eagle", document.getElementById("output").value);
-    labelTag.setAttribute("data-text-only", document.getElementById("textOnlyMode").value);
+	if(document.getElementById("textOnlyMode").checked == true){
+    labelTag.setAttribute("data-text-only", 1);}else{
+	labelTag.setAttribute("data-text-only", 0);	
+	}
 
     document.getElementById("labelGroup").appendChild(labelTag);
     //setDefaults();
@@ -466,7 +469,10 @@ function selectPop(popLabel) {
   document.getElementById("sharpness").value = label.dataset.threshold;
   document.getElementById("scaleFactor").value = label.dataset.scale;
   document.getElementById("output").value = label.dataset.eagle;
-  document.getElementById("textOnlyMode").value = label.dataset.textOnly;
+  if(label.dataset.textOnly == 1){
+  document.getElementById("textOnlyMode").checked = true;
+  textOnlyFlag = 1;  
+  }
 
   $popLabel = jQuery(popLabel.target);
   $popLabel.closest(".popLabel").remove();
