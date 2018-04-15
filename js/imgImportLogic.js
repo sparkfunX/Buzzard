@@ -243,7 +243,9 @@ document.getElementById("maskInvert").onchange = updateLayers;
 document.getElementById("copperInvert").onchange = updateLayers;
 document.getElementById("realWidth").onkeyup = scaleFromW;
 document.getElementById("realHeight").onkeyup = scaleFromH;
-document.getElementsByName("copperFinish").onclick = changeFinish;
+document.getElementById("copperFinish1").onclick = changeFinish;
+document.getElementById("copperFinish2").onclick = changeFinish;
+document.getElementById("copperFinish3").onclick = changeFinish;
 
 function changeFinish() {
 	
