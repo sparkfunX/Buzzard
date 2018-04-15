@@ -390,13 +390,13 @@ function subtractSilk(pixels){
 		var tStopv = dtStop[i+4];
 		var silkv = dsilk[i+4];
 			if (tStopv==255 && silkv==0) {
-			  d[i] = 0;
-			  d[i + 1] = 0;
-			  d[i + 2] = 0;
-			  d[i + 3] = 255;
+			  dtStop[i] = 0;
+			  dtStop[i + 1] = 0;
+			  dtStop[i + 2] = 0;
+			  dtStop[i + 3] = 255;
 			} else {
-			  d[i + 3] = 0;
-			  d[i] = d[i + 1] = d[i + 2] = 255;
+			  dtStop[i + 3] = 0;
+			  dtStop[i] = dtStop[i + 1] = dtStop[i + 2] = 255;
 			}
   }
   return pixels;	 
