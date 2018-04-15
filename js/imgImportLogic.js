@@ -248,7 +248,7 @@ function updateLayers() {
   sizeCanvases();
   
   if(document.getElementById("silkLyr").checked == true && document.getElementById("maskLyr").checked == false && document.getElementById("copperLyr").checked == false){
-	document.getElementById("canvasGroup").style.backgroundImage = "";
+	document.getElementById("canvasGroup").style.backgroundImage = "none";
 	document.getElementById("canvasGroup").style.backgroundColor = document.getElementById("maskColor").value;
   }else{
 	document.getElementById("canvasGroup").style.backgroundColor = "";
