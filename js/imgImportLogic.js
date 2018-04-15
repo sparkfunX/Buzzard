@@ -387,8 +387,8 @@ function subtractSilk(pixels){
 	
 	for (var i = 0; i < dtStop.length; i += 4) {
 
-		var tStopv = dtStop[i+4];
-		var silkv = dsilk[i+4];
+		var tStopv = dtStop[i+3];
+		var silkv = dsilk[i+3];
 			if (tStopv==255 && silkv==0) {
 			  dtStop[i] = 0;
 			  dtStop[i + 1] = 0;
