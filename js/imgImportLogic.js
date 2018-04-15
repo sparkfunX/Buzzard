@@ -20,6 +20,7 @@ copperCanvas.height = 405;
 
 var silkColor = "#ffffff";
 var maskColor = "#000000";
+var copperColor = "#b87333";
 findDimensions();
 
 function eaglify(canvas, layer) {
@@ -226,7 +227,7 @@ function drawCopper() {
   copperCtx.drawImage(inputImg, 0, 0, inputImg.width, inputImg.height, 0, 0, copperCanvas.width, copperCanvas.height);
   var imgData = copperCtx.getImageData(0, 0, copperCanvas.width, copperCanvas.height);
   copperCtx.clearRect(0, 0, copperCanvas.width, copperCanvas.height);
-  copperCtx.putImageData(thresholdImg(document.getElementById("copper-sharpness").value, imgData, 196, 181, 100, inv), 0, 0);
+  copperCtx.putImageData(thresholdImg(document.getElementById("copper-sharpness").value, imgData, hexR(copperColor), hexG(copperColor), hexB(copperColor), inv), 0, 0);
 }
 
 document.getElementById("silkLyr").onchange = updateLayers;
@@ -242,6 +243,18 @@ document.getElementById("maskInvert").onchange = updateLayers;
 document.getElementById("copperInvert").onchange = updateLayers;
 document.getElementById("realWidth").onkeyup = scaleFromW;
 document.getElementById("realHeight").onkeyup = scaleFromH;
+document.getElementsByName("copperFinish").onchange = changeFinish;
+
+function changeFinish() {
+	
+	if ($('input[name=copperFinish]:checked').val() == "Bare") {
+		copperColor = "#b87333";
+	}else if($('input[name=copperFinish]:checked').val() == "HASL") {
+		copperColor = "#f5f5f5";
+	}else if($('input[name=copperFinish]:checked').val() == "ENIG") {
+		copperColor = "#f0e68c";
+	}
+}
 
 function updateLayers() {
 
