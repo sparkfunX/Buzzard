@@ -243,7 +243,7 @@ document.getElementById("maskInvert").onchange = updateLayers;
 document.getElementById("copperInvert").onchange = updateLayers;
 document.getElementById("realWidth").onkeyup = scaleFromW;
 document.getElementById("realHeight").onkeyup = scaleFromH;
-document.getElementsByName("copperFinish").onchange = changeFinish;
+document.getElementsByName("copperFinish").onclick = changeFinish;
 
 function changeFinish() {
 	
@@ -254,6 +254,8 @@ function changeFinish() {
 	}else if($('input[name=copperFinish]:checked').val() == "ENIG") {
 		copperColor = "#f0e68c";
 	}
+	
+	updateLayers();
 }
 
 function updateLayers() {
