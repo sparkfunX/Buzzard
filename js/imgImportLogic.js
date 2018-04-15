@@ -248,9 +248,11 @@ function updateLayers() {
   sizeCanvases();
   
   if(document.getElementById("silkLyr").checked == true && document.getElementById("maskLyr").checked == false && document.getElementById("copperLyr").checked == false){
+	document.getElementById("canvasGroup").style.backgroundImage = "";
 	document.getElementById("canvasGroup").style.backgroundColor = document.getElementById("maskColor").value;
   }else{
-	document.getElementById("canvasGroup").style.backgroundColor = "#fcfc94";
+	document.getElementById("canvasGroup").style.backgroundColor = "";
+	document.getElementById("canvasGroup").style.backgroundImage = "url('https://github.com/sparkfunX/Buzzard/raw/master/img/FR4BG.png')"
   }
 
   silkColor = document.getElementById("silkColor").value;
