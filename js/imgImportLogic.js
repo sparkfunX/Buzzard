@@ -216,7 +216,7 @@ function drawMask() {
   tStopCtx.clearRect(0, 0, tStopCanvas.width, tStopCanvas.height);
 
   maskCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv), 0, 0);
-  tStopCtx.putImageData(subtractSilk(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2), 0, 0));
+  tStopCtx.putImageData(subtractSilk(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2)), 0, 0);
 }
 
 function drawCopper() {
