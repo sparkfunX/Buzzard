@@ -216,9 +216,7 @@ function drawMask() {
   tStopCtx.clearRect(0, 0, tStopCanvas.width, tStopCanvas.height);
 
   maskCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv), 0, 0);
-
-  tStopCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2), 0, 0);
-
+  tStopCtx.putImageData(subtractSilk(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2), 0, 0));
 }
 
 function drawCopper() {
@@ -374,4 +372,32 @@ function scaleFromH() {
 
   document.getElementById("realWidth").value = dectwo(silkCanvas.width * document.getElementById("scaleFactor").value);
 
+}
+
+function subtractSilk(pixels){
+	
+	var silkData = silkCtx.getImageData(0, 0, silkCanvas.width, silkCanvas.height);
+	
+	var dtStop = pixels.data;
+	var dsilk = silkData.data;
+	
+	var returnData
+	
+	// If pixel is on tStop && not on silk then put on return layer
+	
+	for (var i = 0; i < dtStop.length; i += 4) {
+
+		var tStopv = dtStop[i+4];
+		var silkv = dsilk[i+4];
+			if (tStopv==255 && silkv==0) {
+			  d[i] = 0;
+			  d[i + 1] = 0;
+			  d[i + 2] = 0;
+			  d[i + 3] = 255;
+			} else {
+			  d[i + 3] = 0;
+			  d[i] = d[i + 1] = d[i + 2] = 255;
+			}
+  }
+  return pixels;	 
 }
