@@ -243,8 +243,8 @@ document.getElementById("maskInvert").onchange = updateLayers;
 document.getElementById("copperInvert").onchange = updateLayers;
 document.getElementById("realWidth").onkeyup = scaleFromW;
 document.getElementById("realHeight").onkeyup = scaleFromH;
-document.getElementById("realWidth").onchange = scaleFromW;
-document.getElementById("realHeight").onchange = scaleFromH;
+document.getElementById("realWidth").onmouseup = scaleFromW;
+document.getElementById("realHeight").onmouseup = scaleFromH;
 document.getElementById("copperFinish1").onclick = changeFinish;
 document.getElementById("copperFinish2").onclick = changeFinish;
 document.getElementById("copperFinish3").onclick = changeFinish;
@@ -379,7 +379,7 @@ function scaleFromW() {
 
   var realWidth = document.getElementById("realWidth").value;
 
-  document.getElementById("scaleFactor").value = dectwo(realWidth / silkCanvas.width);
+  document.getElementById("scaleFactor").value = realWidth / silkCanvas.width;
 
   document.getElementById("realHeight").value = dectwo(silkCanvas.height * document.getElementById("scaleFactor").value);
 
@@ -389,7 +389,7 @@ function scaleFromH() {
 
   var realHeight = document.getElementById("realHeight").value;
 
-  document.getElementById("scaleFactor").value = dectwo(realHeight / silkCanvas.height);
+  document.getElementById("scaleFactor").value = realHeight / silkCanvas.height;
 
   document.getElementById("realWidth").value = dectwo(silkCanvas.width * document.getElementById("scaleFactor").value);
 
