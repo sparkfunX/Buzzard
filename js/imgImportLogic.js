@@ -20,7 +20,7 @@ copperCanvas.height = 405;
 
 var silkColor = "#ffffff";
 var maskColor = "#000000";
-var copperColor = "#b87333";
+var copperColor = "#b88933";
 findDimensions();
 
 function eaglify(canvas, layer) {
@@ -250,7 +250,7 @@ document.getElementById("copperFinish3").onclick = changeFinish;
 function changeFinish() {
 	
 	if ($('input[name=copperFinish]:checked').val() == "Bare") {
-		copperColor = "#b87333";
+		copperColor = "#b88933";
 	}else if($('input[name=copperFinish]:checked').val() == "HASL") {
 		copperColor = "#f5f5f5";
 	}else if($('input[name=copperFinish]:checked').val() == "ENIG") {
