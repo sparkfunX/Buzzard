@@ -219,9 +219,9 @@ function drawMask() {
   maskCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv), 0, 0);
   
   if(document.getElementById("silkLyr").checked == true){	
-  tStopCtx.putImageData(subtractSilk(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2)), 0, 0);
+  tStopCtx.putImageData(subtractSilk(thresholdImg(document.getElementById("mask-sharpness").value, imgStopData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2)), 0, 0);
   }else{
-  tStopCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2), 0, 0);	  
+  tStopCtx.putImageData(thresholdImg(document.getElementById("mask-sharpness").value, imgStopData, hexR(maskColor), hexG(maskColor), hexB(maskColor), inv2), 0, 0);	  
   }
 }
 
