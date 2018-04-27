@@ -200,7 +200,7 @@ function drawSilk() {
 
 function drawMask() {
   var inv = (document.getElementById("maskInvert").checked == false) ? 255 : 0;
-  var inv2 = (inv == 255) ? 0 : 255;
+  var inv2 = (document.getElementById("maskInvert").checked == false) ? 0 : 255;
 
   maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   tStopCtx.clearRect(0, 0, tStopCanvas.width, tStopCanvas.height);
