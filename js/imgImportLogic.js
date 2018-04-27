@@ -78,14 +78,14 @@ function eaglify(canvas, layer) {
 
 }
 
-function thresholdImg(threshold, pixels, fR, fG, fB, inv) {
+function thresholdImg(threshold, pixels, fR, fG, fB, inverse) {
   var d = pixels.data;
   for (var i = 0; i < d.length; i += 4) {
     var r = d[i];
     var g = d[i + 1];
     var b = d[i + 2];
     var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= threshold) ? 255 : 0;
-    if (v != inv) {
+    if (v != inverse) {
       d[i] = fR;
       d[i + 1] = fG;
       d[i + 2] = fB;
