@@ -23,6 +23,8 @@ var maskColor = "#000000";
 var copperColor = "#b88933";
 findDimensions();
 
+var silkAlertFlag = 0;
+
 function eaglify(canvas, layer) {
 
   var outString = "";
@@ -124,7 +126,7 @@ $("#downloadLib").click(function() {
   // Write packages
 
   lbrFile += "<package name=\"" + cleanName(filename.toUpperCase()) + "\">\n";
-  lbrFile += eaglify(silkCanvas, 21);
+  lbrFile += eaglify(silkCanvas, document.getElementById("silkNum").value);
   lbrFile += eaglify(tStopCanvas, 29);
   lbrFile += eaglify(copperCanvas, 1);
   lbrFile += "</package>\n";
@@ -253,6 +255,19 @@ document.getElementById("realHeight").onmouseup = scaleFromH;
 document.getElementById("copperFinish1").onclick = changeFinish;
 document.getElementById("copperFinish2").onclick = changeFinish;
 document.getElementById("copperFinish3").onclick = changeFinish;
+document.getElementById("silkNum").onclick = silkLyrAlert;
+
+
+function silkLyrAlert() {
+	
+	if(silkAlertFlag == 0){
+	alert("Layer 21 is the tPlace layer for EAGLE. Anything placed on the tPlace layer can be /"flipped/" to the bPlace layer within EAGLE. Changing this number will allow you to import shapes to arbitrary layers, there are some numbers that EAGLE will like in this field more/ledd than others. Use at your own peril.");
+	silkAlertFlag = 1;
+	}
+	
+	updateLayers();	
+	
+}
 
 function changeFinish() {
 	

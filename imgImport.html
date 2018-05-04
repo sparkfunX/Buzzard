@@ -79,13 +79,16 @@
       <div class="layerCtls" id="silkCtls">
         <span class="ctlLabel">Silkscreen</span>
         <br>
-        <input type="checkbox" id="silkLyr">
+       <input type="checkbox" id="silkLyr">
         <label class="ctlLabel" id="silkLyr_label" for="silkLyr">Render</label>
         <input type="checkbox" id="silkInvert">
         <label class="ctlLabel" id="silkInvert_label" for="silkInvert">Invert</label>
         <br>
         <input type="range" min="0" max="255" value="128" id="silk-sharpness">
         <input type="color" id="silkColor" class="colorPick" value="#ffffff">
+		<br>
+	    <input type="number" id="silkNum" value="21">
+		<label class="ctlLabel" id="silkNum_label" for="silkNum">"Silkscreen" Layer ID</label> 
       </div>
       <div class="layerCtls" id="maskCtls">
         <span class="ctlLabel">Soldermask</span>
