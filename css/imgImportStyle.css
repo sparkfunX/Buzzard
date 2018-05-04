@@ -230,3 +230,7 @@ a:visited {
   font-family: "Verdana", sans-serif;
   font-size: 12px;
 }
+
+#silkNum {
+	width: 100px;
+}
