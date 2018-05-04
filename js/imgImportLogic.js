@@ -261,7 +261,7 @@ document.getElementById("silkNum").onclick = silkLyrAlert;
 function silkLyrAlert() {
 	
 	if(silkAlertFlag == 0){
-	alert("Layer 21 is the tPlace layer for EAGLE. Anything placed on the tPlace layer can be /"flipped/" to the bPlace layer within EAGLE. Changing this number will allow you to import shapes to arbitrary layers, there are some numbers that EAGLE will like in this field more/ledd than others. Use at your own peril.");
+	alert("Layer 21 is the tPlace layer for EAGLE. Anything placed on the tPlace layer can be \"flipped\" to the bPlace layer within EAGLE. Changing this number will allow you to import shapes to arbitrary layers, there are some numbers that EAGLE will like in this field more/less than others. Use at your own peril.");
 	silkAlertFlag = 1;
 	}
 	
