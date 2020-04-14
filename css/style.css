@@ -1,71 +1,65 @@
 @font-face {
-    font-family: Allerta-Regular;
+    font-family: 'Allerta';
     src: url(fonts/Allerta-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: Allerta-Regular;
-    src: url(fonts/Allerta-Regular.ttf) format('truetype');
-    font-display: swap;
-}
-
-@font-face {
-    font-family: BreeSerif-Regular;
+    font-family: 'Bree Serif';
     src: url(fonts/BreeSerif-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: Comfortaa-Regular;
+    font-family: 'Comfortaa';
     src: url(fonts/Comfortaa-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: DaysOne-Regular;
+    font-family: 'Days One';
     src: url(fonts/DaysOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: DoppioOne-Regular;
+    font-family: 'Doppio One';
     src: url(fonts/DoppioOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: FredokaOne-Regular;
+    font-family: 'Fredoka One';
     src: url(fonts/FredokaOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: KronaOne-Regular;
+    font-family: 'Krona One';
     src: url(fonts/KronaOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: Lobster-Regular;
+    font-family: 'Lobster';
     src: url(fonts/Lobster-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: Righteous-Regular;
+    font-family: 'Righteous';
     src: url(fonts/Righteous-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: RussoOne-Regular;
+    font-family: 'Russo One';
     src: url(fonts/RussoOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
 
 @font-face {
-    font-family: SecularOne-Regular;
+    font-family: 'Secular One';
     src: url(fonts/SecularOne-Regular.ttf) format('truetype');
     font-display: swap;
 }
