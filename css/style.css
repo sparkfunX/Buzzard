@@ -1,239 +1,310 @@
-@import url('https://fonts.googleapis.com/css?family=Allerta|Bree+Serif|Days+One|Doppio+One|Fredoka+One|Krona+One|Lobster|Righteous|Russo+One|Secular+One|Comfortaa');
+@font-face {
+    font-family: Allerta Regular;
+    src: url(fonts/Allerta-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Allerta Regular;
+    src: url(fonts/Allerta-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Bree Serif Regular;
+    src: url(fonts/BreeSerif-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Comfortaa Regular;
+    src: url(fonts/Comfortaa-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Days One Regular;
+    src: url(fonts/DaysOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Doppio One Regular;
+    src: url(fonts/DoppioOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Fredoka One Regular;
+    src: url(fonts/FredokaOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Krona One Regular;
+    src: url(fonts/KronaOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Lobster Regular;
+    src: url(fonts/Lobster-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Righteous Regular;
+    src: url(fonts/Righteous-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Russo One Regular;
+    src: url(fonts/RussoOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Secular One Regular;
+    src: url(fonts/SecularOne-Regular.ttf) format('ttf');
+    font-display: swap;
+}
+
 body {
-  font-family: "Verdana", sans-serif;
-  background-color: white;
+    font-family: "Verdana", sans-serif;
+    background-color: white;
 }
 
 #output {
-  height: 200px;
-  width: 730px;
-  margin-left: auto;
-  margin-right: auto;
+    height: 200px;
+    width: 730px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #labelCanvas {
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
 }
 
 #viewportCanvas {
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
 }
 
 #controlWindow {
-  float: left;
-  margin-top: 20px;
+    float: left;
+    margin-top: 20px;
 }
 
 #outputWindow {
-  float: left;
-  margin: 20px;
+    float: left;
+    margin: 20px;
 }
 
 #labelMaker {
-  width: 740px;
-  overflow: hidden;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: white;
+    width: 740px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
 }
 
 .ctlLabel {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 #navHeader {
-  height: 50px;
-  background-color: #24292e;
-  width: 740px;
-  margin-left: auto;
-  margin-right: auto;
+    height: 50px;
+    background-color: #24292e;
+    width: 740px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #navXtend {
-  height: 50px;
-  background-color: #24292e;
-  width: 100%;
-  position: absolute;
-  top: 8px;
-  z-index: -1;
+    height: 50px;
+    background-color: #24292e;
+    width: 100%;
+    position: absolute;
+    top: 8px;
+    z-index: -1;
 }
 
 #navBar {
-  position: relative;
-  height: 70px;
-  width: 100%;
-  background-color: #fafbfc;
+    position: relative;
+    height: 70px;
+    width: 100%;
+    background-color: #fafbfc;
 }
 
 #tabline {
-  height: 1px;
-  width: 100%;
-  background-color: #e1e4e8;
-  position: absolute;
-  bottom: 0px;
+    height: 1px;
+    width: 100%;
+    background-color: #e1e4e8;
+    position: absolute;
+    bottom: 0px;
 }
 
 #tabGroup {
-  width: 740px;
-  margin-left: auto;
-  margin-right: auto;
+    width: 740px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #tabAnchor {
-  position: absolute;
-  bottom: 0px;
-  z-index: 10;
+    position: absolute;
+    bottom: 0px;
+    z-index: 10;
 }
 
 .tab.selected {
-  display: inline-block;
-  height: 25px;
-  width: auto;
-  background-color: white;
-  z-index: 10;
-  border-top-color: #ff0066;
-  border-left-color: #e1e4e8;
-  border-right-color: #e1e4e8;
-  border-bottom-color: white;
-  border-style: solid;
-  border-width: 1px;
-  border-top-width: 3px;
-  font-size: 12px;
-  font-family: "Verdana", sans-serif;
-  text-align: center;
-  padding-top: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
+    display: inline-block;
+    height: 25px;
+    width: auto;
+    background-color: white;
+    z-index: 10;
+    border-top-color: #ff0066;
+    border-left-color: #e1e4e8;
+    border-right-color: #e1e4e8;
+    border-bottom-color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-top-width: 3px;
+    font-size: 12px;
+    font-family: "Verdana", sans-serif;
+    text-align: center;
+    padding-top: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .tab.unselected {
-  display: inline-block;
-  height: 25px;
-  width: auto;
-  background-color: #fafbfc;
-  z-index: 10;
-  border-top-color: #fafbfc;
-  border-left-color: #fafbfc;
-  border-right-color: #fafbfc;
-  border-bottom-color: #e1e4e8;
-  border-style: solid;
-  border-width: 1px;
-  font-size: 12px;
-  font-family: "Verdana", sans-serif;
-  text-align: center;
-  padding-top: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  color: #d8d8d8;
+    display: inline-block;
+    height: 25px;
+    width: auto;
+    background-color: #fafbfc;
+    z-index: 10;
+    border-top-color: #fafbfc;
+    border-left-color: #fafbfc;
+    border-right-color: #fafbfc;
+    border-bottom-color: #e1e4e8;
+    border-style: solid;
+    border-width: 1px;
+    font-size: 12px;
+    font-family: "Verdana", sans-serif;
+    text-align: center;
+    padding-top: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    color: #d8d8d8;
 }
 
 #logo {
-  margin: 5px;
+    margin: 5px;
 }
 
 #title {
-  position: relative;
-  font-family: "Allerta", sans-serif;
-  color: #fafbfc;
-  font-size: 20px;
-  top: -25px;
-  cursor: default;
-  pointer-events: none;
+    position: relative;
+    font-family: "Allerta", sans-serif;
+    color: #fafbfc;
+    font-size: 20px;
+    top: -25px;
+    cursor: default;
+    pointer-events: none;
 }
 
 #subtitle {
-  position: relative;
-  font-family: "Allerta", sans-serif;
-  color: #fafbfc;
-  font-size: 12px;
-  top: -10px;
-  left: -100px;
-  cursor: default;
-  pointer-events: none;
+    position: relative;
+    font-family: "Allerta", sans-serif;
+    color: #fafbfc;
+    font-size: 12px;
+    top: -10px;
+    left: -100px;
+    cursor: default;
+    pointer-events: none;
 }
 
 #docsLink {
-  position: relative;
-  top: 17px;
-  float: right;
-  margin: 10px;
+    position: relative;
+    top: 17px;
+    float: right;
+    margin: 10px;
 }
 
 #repoLink {
-  position: relative;
-  top: 17px;
-  float: right;
-  margin: 10px;
+    position: relative;
+    top: 17px;
+    float: right;
+    margin: 10px;
 }
 
 #realSize {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 #spacer {
-  height: 40px;
-  background-color: white;
-  width: 730px;
-  margin-left: auto;
-  margin-right: auto;
+    height: 40px;
+    background-color: white;
+    width: 730px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #labelGroup {
-  height: 50px;
-  width: 240px;
-  background-color: #fafbfc;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  overflow-y: scroll;
+    height: 50px;
+    width: 240px;
+    background-color: #fafbfc;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    overflow-y: scroll;
 }
 
 .popLabel {
-  height: 10px;
-  max-height: 10px;
-  width: auto;
-  background-color: #ff0066;
-  margin: 3px;
-  display: inline-block;
-  font-size: 8px;
-  text-align: center;
-  font-weight: bold;
-  padding: 5px;
-  color: white;
-  border-radius: 8px;
-  cursor: default;
-  position: relative;
+    height: 10px;
+    max-height: 10px;
+    width: auto;
+    background-color: #ff0066;
+    margin: 3px;
+    display: inline-block;
+    font-size: 8px;
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+    color: white;
+    border-radius: 8px;
+    cursor: default;
+    position: relative;
 }
 
 .deleteButton {
-  height: 8px;
-  max-height: 8px;
-  width: 8px;
-  border-radius: 4px;
-  background-color: white;
-  font-size: 6px;
-  color: black;
-  cursor: pointer;
-  position: absolute;
-  top: -1px;
-  right: -3px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-  z-index: 100;
+    height: 8px;
+    max-height: 8px;
+    width: 8px;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 6px;
+    color: black;
+    cursor: pointer;
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    z-index: 100;
 }
 
 a:link {
-  color: #fafbfc;
-  font-family: "Verdana", sans-serif;
-  font-size: 12px;
+    color: #fafbfc;
+    font-family: "Verdana", sans-serif;
+    font-size: 12px;
 }
 
 a:visited {
-  color: #fafbfc;
-  font-family: "Verdana", sans-serif;
-  font-size: 12px;
+    color: #fafbfc;
+    font-family: "Verdana", sans-serif;
+    font-size: 12px;
 }
