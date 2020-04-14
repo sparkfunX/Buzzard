@@ -1,72 +1,73 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
 
-  <title>Buzzard - SparkX EAGLE Tools</title>
-  <meta name="description" content="SparkX EAGLE Silkscreen Tools">
-  <meta name="author" content="NPoole@SparkX">
+    <title>Buzzard - SparkX EAGLE Tools</title>
+    <meta name="description" content="SparkX EAGLE Silkscreen Tools">
+    <meta name="author" content="NPoole@SparkX">
 
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/FileSaver.min.js"></script>
+    <script src="js/jquery.min.js"></script>
 
-  <!--[if lt IE 9]>
+    <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
 </head>
 
 <body>
-<div id="navHeader">
-  <img src="https://github.com/sparkfunX/Buzzard/raw/master/logo-1-gray.png" width="40px" height="40px" id="logo">
-  <span id="title">BUZZARD</span>
-  <span id="subtitle">EAGLE Utilities</span>
-  <a href="https://github.com/sparkfunX/Buzzard/wiki/" id="docsLink">Docs</a>
-  <a href="https://github.com/sparkfunX/Buzzard" id="repoLink">Github Repo</a>
-</div>
-<div id="navXtend"></div>
-<div id="navBar">
-  <div id="tabGroup">
-    <div id="tabAnchor">
-
-      <div id="labelMakerTab" class="tab selected">
-        Label Maker
-      </div>
-
-      <div id="BarcodeMakerTab" class="tab unselected">
-        Barcode Maker
-      </div>
-
-      <div id="padDesignerTab" class="tab unselected">
-        Pad Designer
-      </div>
-
-      <div id="imageImporterTab" class="tab unselected">
-        <a href="https://sparkfunx.github.io/Buzzard/imgImport.html" style="color: black; text-decoration: none;">Image Importer</a>
-      </div>
-
-      <div id="libraryManagerTab" class="tab unselected">
-        Library Manager
-      </div>
-
+    <div id="navHeader">
+        <img src="https://github.com/sparkfunX/Buzzard/raw/master/logo-1-gray.png" width="40px" height="40px" id="logo">
+        <span id="title">BUZZARD</span>
+        <span id="subtitle">EAGLE Utilities</span>
+        <a href="https://github.com/sparkfunX/Buzzard/wiki/" id="docsLink">Docs</a>
+        <a href="https://github.com/sparkfunX/Buzzard" id="repoLink">Github Repo</a>
     </div>
-  </div>
-  <div id="tabline"></div>
-</div>
-<div id="labelMaker">
-  <div id="outputWindow">
-    <canvas id="viewportCanvas">   
+    <div id="navXtend"></div>
+    <div id="navBar">
+        <div id="tabGroup">
+            <div id="tabAnchor">
+
+                <div id="labelMakerTab" class="tab selected">
+                    Label Maker
+                </div>
+
+                <div id="BarcodeMakerTab" class="tab unselected">
+                    Barcode Maker
+                </div>
+
+                <div id="padDesignerTab" class="tab unselected">
+                    Pad Designer
+                </div>
+
+                <div id="imageImporterTab" class="tab unselected">
+                    <a href="https://sparkfunx.github.io/Buzzard/imgImport.html" style="color: black; text-decoration: none;">Image Importer</a>
+                </div>
+
+                <div id="libraryManagerTab" class="tab unselected">
+                    Library Manager
+                </div>
+
+            </div>
+        </div>
+        <div id="tabline"></div>
+    </div>
+    <div id="labelMaker">
+        <div id="outputWindow">
+            <canvas id="viewportCanvas">   
   </canvas>
-  </div>
-  <div id="controlWindow">
-    <span class="ctlLabel">Label Text</span>
-    <input type="text" id="labelText" value="GND">
-    <br>
-    <div id="labelGroup">
-    </div>
-    <span class="ctlLabel">Label Font</span>
-    <select id="labelFont" class="input">
+        </div>
+        <div id="controlWindow">
+            <span class="ctlLabel">Label Text</span>
+            <input type="text" id="labelText" value="GND">
+            <br>
+            <div id="labelGroup">
+            </div>
+            <span class="ctlLabel">Label Font</span>
+            <select id="labelFont" class="input">
       <option value="Bree Serif">Bree Serif</option>
       <option value="Russo One">Russo One</option>
       <option value="Days One">Days One</option>
@@ -79,15 +80,15 @@
       <option value="Lobster">Lobster</option>
       <option value="Comfortaa">Comfortaa</option>
     </select>
-    <br>
-    <span class="ctlLabel">Font Size</span>
-    <input type="number" id="fontSize" value="36">
-    <br>
-    <span class="ctlLabel">Vertical Offset</span>
-    <input type="number" id="fontOffsetV" value="7">
-    <br>
-    <span class="ctlLabel">Left Cap Style</span>
-    <select id="leftCapStyle" class="input">
+            <br>
+            <span class="ctlLabel">Font Size</span>
+            <input type="number" id="fontSize" value="36">
+            <br>
+            <span class="ctlLabel">Vertical Offset</span>
+            <input type="number" id="fontOffsetV" value="7">
+            <br>
+            <span class="ctlLabel">Left Cap Style</span>
+            <select id="leftCapStyle" class="input">
       <option value="square">square</option>
       <option value="rounded" selected="selected">rounded</option>
       <option value="pointer">pointer</option>
@@ -95,9 +96,9 @@
       <option value="forwardslash">forwardslash</option>
       <option value="backslash">backslash</option>
     </select>
-    <br>
-    <span class="ctlLabel">Right Cap Style</span>
-    <select id="rightCapStyle" class="input">
+            <br>
+            <span class="ctlLabel">Right Cap Style</span>
+            <select id="rightCapStyle" class="input">
       <option value="square">square</option>
       <option value="rounded" selected="selected">rounded</option>
       <option value="pointer">pointer</option>
@@ -105,37 +106,38 @@
       <option value="forwardslash">forwardslash</option>
       <option value="backslash">backslash</option>
 	  </select>
-    <br>
-    <span class="ctlLabel">Sharpness</span>
-    <br>
-    <input type="range" min="250" max="765" value="650" id="sharpness">
-    <br>
-    <span class="ctlLabel">EAGLE Scale Factor</span>
-    <br>
-    <input type="number" id="scaleFactor" step=".01" value="0.04">
-    <br>
-    <span id="realSize"></span>
-    <br>
-    <input type="button" value="Download EAGLE Library" id="downloadLib">
-    <br>
-    <br>
-    <input type="checkbox" value="Text Only" id="textOnlyMode">
-    <label class="ctlLabel" id="txt_only_label" for="textOnlyMode">Text Only</label>
-    <br>
-    <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
-    <label class="ctlLabel" id="invert_label" for="invertCanvasCheck">Invert Preview</label>
-    <br>
-    <input type="checkbox" value="Show XML" id="showXML">
-    <label class="ctlLabel" id="showxml_label" for="showXML">Show XML</label>
-  </div>
-  <br>
-  <textarea id="output" style="visibility: hidden;"></textarea>
-  
-  <canvas id="labelCanvas" hidden>   
+            <br>
+            <span class="ctlLabel">Sharpness</span>
+            <br>
+            <input type="range" min="250" max="765" value="650" id="sharpness">
+            <br>
+            <span class="ctlLabel">EAGLE Scale Factor</span>
+            <br>
+            <input type="number" id="scaleFactor" step=".01" value="0.04">
+            <br>
+            <span id="realSize"></span>
+            <br>
+            <input type="button" value="Download EAGLE Library" id="downloadLib">
+            <br>
+            <br>
+            <input type="checkbox" value="Text Only" id="textOnlyMode">
+            <label class="ctlLabel" id="txt_only_label" for="textOnlyMode">Text Only</label>
+            <br>
+            <input type="checkbox" value="Invert Preview" id="invertCanvasCheck">
+            <label class="ctlLabel" id="invert_label" for="invertCanvasCheck">Invert Preview</label>
+            <br>
+            <input type="checkbox" value="Show XML" id="showXML">
+            <label class="ctlLabel" id="showxml_label" for="showXML">Show XML</label>
+        </div>
+        <br>
+        <textarea id="output" style="visibility: hidden;"></textarea>
+
+        <canvas id="labelCanvas" hidden>   
   </canvas>
-  
-  <canvas id="scalingCanvas" hidden></canvas>
-</div>
-<script src="js/logic.js"></script>
+
+        <canvas id="scalingCanvas" hidden></canvas>
+    </div>
+    <script src="js/logic.js"></script>
 </body>
+
 </html>
