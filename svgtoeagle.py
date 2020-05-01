@@ -1,23 +1,29 @@
+import argparse
 from svgpathtools import svg2paths2
 import math
 
+scaleFactor = 300.0
 SCALE = 1 / 90
-SUBSAMPLING = .01 # subsampling of SVG path
+SUBSAMPLING = .01  # subsampling of SVG path
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
-TRACEWIDTH = '0.1' # in mm
+TRACEWIDTH = '0.1'  # in mm
 EAGLE_FORMAT = 'board'
 
 # Use Pythagoras to find the distance between two points
+
+
 def dist(a, b):
     dx = a.real - b.real
     dy = a.imag - b.imag
     return math.sqrt(dx * dx + dy * dy)
 
-##################LOOK INTO USING BUILTIN POLYGON INSIDE DETECTION FROM SVGPATHTOOLS
+# LOOK INTO USING BUILTIN POLYGON INSIDE DETECTION FROM SVGPATHTOOLS
 
 # ray-casting algorithm based on
 # http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+
+
 def isInside(point, poly):
     x = point.real
     y = point.imag
@@ -29,8 +35,9 @@ def isInside(point, poly):
         yi = poly[i].imag
         xj = poly[j].real
         yj = poly[j].imag
-        intersect = ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
-        if intersect: 
+        intersect = ((yi > y) != (yj > y)) and (
+            x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+        if intersect:
             inside = not inside
         j = i
         i += 1
@@ -52,7 +59,8 @@ def polygonArea(poly):
 
 # Move a small distance away from path[idxa] towards path[idxb]
 def interpPt(path, idxa, idxb):
-    amt = TRACEWIDTH / 8 # a fraction of the trace width so we don't get much of a notch in the line
+    # a fraction of the trace width so we don't get much of a notch in the line
+    amt = TRACEWIDTH / 8
     # wrap index
     if idxb < 0:
         idxb += len(path)
@@ -65,8 +73,8 @@ def interpPt(path, idxa, idxb):
     dy = b.imag - a.imag
     d = math.sqrt(dx * dx + dy * dy)
     if amt > d:
-        return [] # return nothing - will just end up using the last point
-    return complex(a.real + (dx * amt / d), a.imag + (dy * amt / d)) 
+        return []  # return nothing - will just end up using the last point
+    return complex(a.real + (dx * amt / d), a.imag + (dy * amt / d))
 
 
 # Some svg paths conatin multiple nested polygons. We need to open them and splice them together.
@@ -99,7 +107,7 @@ def unpackPoly(poly):
             i += 1
 
         if outerPolyIndex != 'undefined':
-            path.reverse() # reverse poly
+            path.reverse()  # reverse poly
             outerPoly = finalPolys[outerPolyIndex]
             minDist = 10000000000
             minOuter = 0
@@ -120,19 +128,19 @@ def unpackPoly(poly):
                 # but we have to recess the two joins a little
                 # otherwise Eagle reports Invalid poly when filling
                 # the top layer
-            finalPolys[outerPolyIndex] = outerPoly[0:minOuter].extend(\
-                    [interpPt(outerPoly, minOuter, minOuter - 1),\
-                    interpPt(path, minPath, minPath + 1),\
-                    path[minPath + 1:],\
-                    path[:minPath],\
-                    interpPt(path, minPath, minPath - 1),\
-                    interpPt(outerPoly, minOuter, minOuter + 1),\
-                    outerPoly[minOuter + 1:]]\
-                )
+            finalPolys[outerPolyIndex] = outerPoly[0:minOuter].extend(
+                [interpPt(outerPoly, minOuter, minOuter - 1),
+                 interpPt(path, minPath, minPath + 1),
+                 path[minPath + 1:],
+                 path[:minPath],
+                 interpPt(path, minPath, minPath - 1),
+                 interpPt(outerPoly, minOuter, minOuter + 1),
+                 outerPoly[minOuter + 1:]]
+            )
         else:
             # not inside, just add this poly
             finalPolys.extend(path)
-        
+
         p += 1
     return finalPolys
 
@@ -145,7 +153,6 @@ def drawSVG(svg_attributes, attributes, paths):
     global SIMPLIFY
     global SIMPLIFYHQ
 
-    EAGLE_LAYER = '21'
     SIGNAL_NAME = 'GND'
 
     out = ''
@@ -155,43 +162,47 @@ def drawSVG(svg_attributes, attributes, paths):
 
     if 'viewBox' in svg_attributes.keys():
         if svg_attributes['viewBox'].split()[2] != '0':
-            svgWidth = str(round(float(svg_attributes['viewBox'].split()[2]),2))
-            svgHeight = str(round(float(svg_attributes['viewBox'].split()[3]),2))
+            svgWidth = str(
+                round(float(svg_attributes['viewBox'].split()[2]), 2))
+            svgHeight = str(
+                round(float(svg_attributes['viewBox'].split()[3]), 2))
         else:
             svgWidth = svg_attributes['width']
             svgHeight = svg_attributes['height']
     else:
         svgWidth = svg_attributes['width']
-        svgHeight = svg_attributes['height']        
+        svgHeight = svg_attributes['height']
 
     specifiedWidth = svg_attributes['width']
     if 'mm' in specifiedWidth:
-        specifiedWidth = float(specifiedWidth.replace('mm',''))
+        specifiedWidth = float(specifiedWidth.replace('mm', ''))
         SCALE = specifiedWidth / float(svgWidth)
         print("SVG width detected in mm \\o/")
     elif 'in' in specifiedWidth:
-        specifiedWidth = float(specifiedWidth.replace('in','')) * 25.4
+        specifiedWidth = float(specifiedWidth.replace('in', '')) * 25.4
         SCALE = specifiedWidth / float(svgWidth)
         print("SVG width detected in inches")
     else:
-        SCALE = 1 / 3.542
+        SCALE = 1 / args.scaleFactor
         print("SVG width not found")
         # DO SOMETHING HERE TO ESCAPE AND TELL THE USER THEY'RE BONED
 
     exportHeight = float(svgHeight) * SCALE
 
     if EAGLE_FORMAT == "board":
-        out += "CHANGE layer " + EAGLE_LAYER + "; CHANGE rank 3; CHANGE pour solid; SET WIRE_BEND 2;\n"
+        out += "CHANGE layer " + str(args.eagleLayerNumber) + \
+            "; CHANGE rank 3; CHANGE pour solid; SET WIRE_BEND 2;\n"
     if EAGLE_FORMAT == "library":
-        out += "CHANGE layer " + EAGLE_LAYER + "; CHANGE pour solid; Grid mm; SET WIRE_BEND 2;\n"
+        out += "CHANGE layer " + str(args.eagleLayerNumber) + \
+            "; CHANGE pour solid; Grid mm; SET WIRE_BEND 2;\n"
 
     if len(paths) == 0:
         print("No paths found. Did you use 'Object to path' in Inkscape?")
     anyVisiblePaths = False
     i = 0
-    while i < len(paths): 
+    while i < len(paths):
         path = paths[i]
-        
+
         if 'fill' in attributes[i].keys():
             filled = attributes[i]['fill'] != 'none' and attributes[i]['fill'] != ''
         else:
@@ -201,9 +212,9 @@ def drawSVG(svg_attributes, attributes, paths):
             stroked = attributes[i]['stroke'] != 'none' and attributes[i]['stroke'] != ''
         else:
             stroked = False
-        
+
         if not filled and not stroked:
-            continue ## not drawable (clip path?)
+            continue  # not drawable (clip path?)
         anyVisiblePaths = True
         l = path.length()
         divs = round(l * SUBSAMPLING)
@@ -233,7 +244,7 @@ def drawSVG(svg_attributes, attributes, paths):
             s += 1
 
         if len(points) > 1:
-            #print(points)
+            # print(points)
             points = simplify(points, SIMPLIFY, SIMPLIFYHQ)
             polys.append(points)
 
@@ -249,30 +260,31 @@ def drawSVG(svg_attributes, attributes, paths):
                 points.append(points[0])
 
                 if EAGLE_FORMAT == "board":
-                    scriptLine += "polygon " + SIGNAL_NAME + " " + TRACEWIDTH + "mm "
-                
+                    scriptLine += "polygon " + args.signalName + " " + TRACEWIDTH + "mm "
+
                 if EAGLE_FORMAT == "library":
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
-                
+
             else:
                 if EAGLE_FORMAT == "board":
-                    scriptLine += "polygon " + SIGNAL_NAME + " " + TRACEWIDTH + "mm "
-                
+                    scriptLine += "polygon " + args.signalName + " " + TRACEWIDTH + "mm "
+
                 if EAGLE_FORMAT == "library":
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
-            
-            for p in points: 
+
+            for p in points:
                 scriptLine += f'({round(p.real, 6)}mm {round(exportHeight - p.imag, 6)}mm) '
-            
+
             scriptLine += ';'
             out += scriptLine + '\n'
-        
+
         i += 1
 
     if not anyVisiblePaths:
         print("No paths with fills or strokes found.")
 
     return out
+
 
 def convert(filename):
 
@@ -281,7 +293,7 @@ def convert(filename):
 
 
 ####################
-#SIMPLIFY
+# SIMPLIFY
 ####################
 
 # square distance from a point to a segment
@@ -302,7 +314,7 @@ def getSqSegDist(p, p1, p2):
 
         elif (t > 0):
             x += dx * t
-            y += dy * t 
+            y += dy * t
 
     dx = p.real - x
     dy = p.imag - y
@@ -337,7 +349,7 @@ def simplifyRadialDist(points, sqTolerance):
 # simplification using optimized Douglas-Peucker algorithm with recursion elimination
 def simplifyDouglasPeucker(points, sqTolerance):
 
-    leng = len(points)    
+    leng = len(points)
     markers = [''] * leng
     first = 0
     last = leng - 1
@@ -351,19 +363,18 @@ def simplifyDouglasPeucker(points, sqTolerance):
         maxSqDist = 0
 
         i = first + 1
-        while i < last: 
+        while i < last:
             sqDist = getSqSegDist(points[i], points[first], points[last])
 
             if sqDist > maxSqDist:
                 index = i
                 maxSqDist = sqDist
-            
+
             i += 1
 
         if maxSqDist > sqTolerance:
             markers[index] = 1
             stack.extend([first, index, index, last])
-        
 
         if stack:
             last = stack.pop()
@@ -385,10 +396,35 @@ def simplify(points, tolerance, highestQuality):
 
     sqTolerance = tolerance * tolerance if tolerance != '' else 1
 
-    points = points if highestQuality else simplifyRadialDist(points, sqTolerance)
+    points = points if highestQuality else simplifyRadialDist(
+        points, sqTolerance)
 
     points = simplifyDouglasPeucker(points, sqTolerance)
 
     return points
 
-convert('text.svg')
+
+# ******************************************************************************
+#
+# Main program flow
+#
+# ******************************************************************************
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description='SparkFun Buzzard Label Generator')
+
+    parser.add_argument('text', help='Label text')
+
+    parser.add_argument('-s', dest='scaleFactor', default=30.0,
+                        type=float, help='Scale factor')
+
+    parser.add_argument('-l', dest='eagleLayerNumber', default=21,
+                        type=int, help='Layer in EAGLE to create label into (default is tPlace)')
+
+    parser.add_argument('-n', dest='signalName', default='GND',
+                        help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
+
+    args = parser.parse_args()
+
+    convert('text.svg')
