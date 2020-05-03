@@ -2,13 +2,12 @@ import argparse
 from svgpathtools import svg2paths2
 import math
 
-scaleFactor = 300.0
 SCALE = 1 / 90
 SUBSAMPLING = .01  # subsampling of SVG path
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
 TRACEWIDTH = '0.1'  # in mm
-EAGLE_FORMAT = 'board'
+EAGLE_FORMAT = 'library'
 
 # Use Pythagoras to find the distance between two points
 
@@ -289,14 +288,19 @@ def drawSVG(svg_attributes, attributes, paths):
 def convert(filename):
 
     paths, attributes, svg_attributes = svg2paths2(filename)
-    print(drawSVG(svg_attributes, attributes, paths))
 
+    f = open('output.scr', 'w')
+
+    #print(drawSVG(svg_attributes, attributes, paths))
+    f.write(drawSVG(svg_attributes, attributes, paths))
 
 ####################
 # SIMPLIFY
 ####################
 
 # square distance from a point to a segment
+
+
 def getSqSegDist(p, p1, p2):
 
     x = p1.real
@@ -414,10 +418,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='SparkFun Buzzard Label Generator')
 
-    parser.add_argument('text', help='Label text')
+    parser.add_argument('fileToConvert', help='SVG file to convert')
 
-    parser.add_argument('-s', dest='scaleFactor', default=30.0,
-                        type=float, help='Scale factor')
+    parser.add_argument('-s', dest='scaleFactor', default=300.0,
+                        type=float, help='Scale factor. Larger')
 
     parser.add_argument('-l', dest='eagleLayerNumber', default=21,
                         type=int, help='Layer in EAGLE to create label into (default is tPlace)')
@@ -427,4 +431,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    convert('text.svg')
+    convert(args.fileToConvert)
