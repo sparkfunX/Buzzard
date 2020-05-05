@@ -1,6 +1,7 @@
 import argparse
 from svgpathtools import svg2paths2
 import math
+import os
 
 SCALE = 1 / 90
 SUBSAMPLING = .01  # subsampling of SVG path
@@ -289,8 +290,10 @@ def convert(filename):
 
     paths, attributes, svg_attributes = svg2paths2(filename)
 
+    path_to_script = os.path.dirname(os.path.abspath(__file__))
+
     try:
-        f = open(args.outputFile, 'w')
+        f = open(path_to_script + "/output.scr", 'w')
         print(drawSVG(svg_attributes, attributes, paths))  # output to terminal
         f.write(drawSVG(svg_attributes, attributes, paths))
         f.close
@@ -425,8 +428,6 @@ if __name__ == '__main__':
         description='SparkFun Buzzard Label Generator')
 
     parser.add_argument('fileToConvert', help='SVG file to convert')
-
-    parser.add_argument('outputFile', help='EAGLE SCR to create')
 
     parser.add_argument('-s', dest='scaleFactor', default=300.0,
                         type=float, help='Scale factor. Larger')
