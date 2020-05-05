@@ -289,10 +289,16 @@ def convert(filename):
 
     paths, attributes, svg_attributes = svg2paths2(filename)
 
-    f = open('output.scr', 'w')
+    try:
+        f = open(args.outputFile, 'w')
+        print(drawSVG(svg_attributes, attributes, paths))  # output to terminal
+        f.write(drawSVG(svg_attributes, attributes, paths))
+        f.close
 
-    #print(drawSVG(svg_attributes, attributes, paths))
-    f.write(drawSVG(svg_attributes, attributes, paths))
+    except:
+        print("Failed to create output file")
+        sys.exit(0)  # quit Python
+
 
 ####################
 # SIMPLIFY
@@ -419,6 +425,8 @@ if __name__ == '__main__':
         description='SparkFun Buzzard Label Generator')
 
     parser.add_argument('fileToConvert', help='SVG file to convert')
+
+    parser.add_argument('outputFile', help='EAGLE SCR to create')
 
     parser.add_argument('-s', dest='scaleFactor', default=300.0,
                         type=float, help='Scale factor. Larger')

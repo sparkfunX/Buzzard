@@ -5,7 +5,8 @@
 
     /*
 
-    run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg -s 300
+    run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg C:/Dropbox/Projects/Buzzard/myOutput.scr -s 300
+
 
 */
 
@@ -61,8 +62,8 @@ void createLabel()
     }
 
     //Python script should create a EAGLE friendly script file. Now run it.
-    string scriptFile = filedir(argv[0]) + "output.scr";
-    sprintf(s, "SCRIPT %s;", scriptFile);
+    string scriptFileLocation = argv[2]; //The third command is the file location of the SCR that was just created by the python script
+    sprintf(s, "SCRIPT %s;", scriptFileLocation);
     exit(s);
 }
 
