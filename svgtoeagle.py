@@ -1,6 +1,7 @@
 import argparse
 from svgpathtools import svg2paths2
 import math
+import os
 
 SCALE = 1 / 90
 SUBSAMPLING = .01  # subsampling of SVG path
@@ -289,10 +290,18 @@ def convert(filename):
 
     paths, attributes, svg_attributes = svg2paths2(filename)
 
-    f = open('output.scr', 'w')
+    path_to_script = os.path.dirname(os.path.abspath(__file__))
 
-    #print(drawSVG(svg_attributes, attributes, paths))
-    f.write(drawSVG(svg_attributes, attributes, paths))
+    try:
+        f = open(path_to_script + "/output.scr", 'w')
+        print(drawSVG(svg_attributes, attributes, paths))  # output to terminal
+        f.write(drawSVG(svg_attributes, attributes, paths))
+        f.close
+
+    except:
+        print("Failed to create output file")
+        sys.exit(0)  # quit Python
+
 
 ####################
 # SIMPLIFY

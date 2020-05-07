@@ -7,6 +7,7 @@
 
     run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg -s 300
 
+
 */
 
     string commandToRun;
@@ -61,8 +62,7 @@ void createLabel()
     }
 
     //Python script should create a EAGLE friendly script file. Now run it.
-    string scriptFile = filedir(argv[0]) + "output.scr";
-    sprintf(s, "SCRIPT %s;", scriptFile);
+    sprintf(s, "SCRIPT %s;", localDirectory + "/output.scr");
     exit(s);
 }
 
