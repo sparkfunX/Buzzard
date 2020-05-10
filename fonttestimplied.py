@@ -10,7 +10,7 @@ def tuple_to_imag(t):
 #face = Face('./FredokaOne-Regular.ttf')
 face = Face('./Roboto.ttf')
 face.set_char_size(8,8,300,300)
-face.load_char('e')
+face.load_char('d')
 outline = face.glyph.outline
 y = [t[1] for t in outline.points]
 # flip the points, why? Dunno, they come in upside-down! 

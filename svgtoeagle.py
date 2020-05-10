@@ -1,29 +1,34 @@
-import argparse
 from svgpathtools import svg2paths2
+from svgelements import Line, QuadraticBezier, CubicBezier, Path, Matrix
+import argparse
 import math
 import os
+import sys
 
 SCALE = 1 / 90
-SUBSAMPLING = .01  # subsampling of SVG path
+SUBSAMPLING = 1  # subsampling of SVG path
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
 TRACEWIDTH = '0.1'  # in mm
-EAGLE_FORMAT = 'library'
+EAGLE_FORMAT = 'board'
 
 # Use Pythagoras to find the distance between two points
-
-
 def dist(a, b):
     dx = a.real - b.real
     dy = a.imag - b.imag
     return math.sqrt(dx * dx + dy * dy)
 
-# LOOK INTO USING BUILTIN POLYGON INSIDE DETECTION FROM SVGPATHTOOLS
+# Parse a style tag into a dictionary
+def styleParse(attr):
+    out = dict()
+    i = 0
+    for tag in attr.split(';'):
+            out[tag.split(':')[0]] = tag.split(':')[1]
+            i += 1
+    return out
 
 # ray-casting algorithm based on
 # http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-
-
 def isInside(point, poly):
     x = point.real
     y = point.imag
@@ -60,12 +65,15 @@ def polygonArea(poly):
 # Move a small distance away from path[idxa] towards path[idxb]
 def interpPt(path, idxa, idxb):
     # a fraction of the trace width so we don't get much of a notch in the line
-    amt = TRACEWIDTH / 8
+
+    amt = float(TRACEWIDTH) / 8
+
     # wrap index
     if idxb < 0:
         idxb += len(path)
     if idxb >= len(path):
         idxb -= len(path)
+          
     # get 2 pts
     a = path[idxa]
     b = path[idxb]
@@ -82,11 +90,13 @@ def unpackPoly(poly):
     # ensure all polys are the right way around
     p = 0
     while p < len(poly):
+        print(polygonArea(poly[p]))
         if polygonArea(poly[p]) > 0:
             poly[p].reverse()
         p += 1
 
     finalPolys = [poly[0]]
+
     p = 1
     while p < len(poly):
         path = poly[p]
@@ -124,24 +134,37 @@ def unpackPoly(poly):
                     b += 1
                 a += 1
 
+            print(path[minPath + 1:][0])
+
                 # splice the inner poly into the outer poly
                 # but we have to recess the two joins a little
                 # otherwise Eagle reports Invalid poly when filling
                 # the top layer
-            finalPolys[outerPolyIndex] = outerPoly[0:minOuter].extend(
-                [interpPt(outerPoly, minOuter, minOuter - 1),
-                 interpPt(path, minPath, minPath + 1),
-                 path[minPath + 1:],
-                 path[:minPath],
-                 interpPt(path, minPath, minPath - 1),
-                 interpPt(outerPoly, minOuter, minOuter + 1),
-                 outerPoly[minOuter + 1:]]
-            )
+            finalPolys[outerPolyIndex] = outerPoly[0:minOuter]
+            finalPolys[outerPolyIndex].append(interpPt(outerPoly, minOuter, minOuter - 1))
+            finalPolys[outerPolyIndex].append(interpPt(path, minPath, minPath + 1))
+            finalPolys[outerPolyIndex].extend(path[minPath + 1:])
+            finalPolys[outerPolyIndex].extend(path[:minPath])
+            finalPolys[outerPolyIndex].append(interpPt(path, minPath, minPath - 1))
+            finalPolys[outerPolyIndex].append(interpPt(outerPoly, minOuter, minOuter + 1))    
+            finalPolys[outerPolyIndex].extend(outerPoly[minOuter + 1:])      
+
+            #finalPolys[outerPolyIndex].extend(
+            #    [interpPt(outerPoly, minOuter, minOuter - 1),
+            #     interpPt(path, minPath, minPath + 1),
+            #     path[minPath + 1:],
+            #     path[:minPath],
+            #     interpPt(path, minPath, minPath - 1),
+            #     interpPt(outerPoly, minOuter, minOuter + 1),
+            #     outerPoly[minOuter + 1:]]
+            #)
+            
         else:
             # not inside, just add this poly
-            finalPolys.extend(path)
+            finalPolys.append(path)
 
         p += 1
+
     return finalPolys
 
 
@@ -152,8 +175,6 @@ def drawSVG(svg_attributes, attributes, paths):
     global SUBSAMPLING
     global SIMPLIFY
     global SIMPLIFYHQ
-
-    SIGNAL_NAME = 'GND'
 
     out = ''
 
@@ -201,26 +222,48 @@ def drawSVG(svg_attributes, attributes, paths):
     anyVisiblePaths = False
     i = 0
     while i < len(paths):
-        path = paths[i]
+        #path = paths[i]
+
+        # Apply the tranform from this svg object to actually transform the points
+        # We need the Matrix object from svgelements but we can only matrix multiply with
+        # svgelements' version of the Path object so we're gonna do some dumb stuff
+        # to launder the Path object from svgpathtools through a d-string into 
+        # svgelements' version of Path. Luckily, the Path object from svgelements has 
+        # backwards compatible .point methods
+        pathTransform = Matrix('')
+        if 'transform' in attributes[i].keys():
+            pathTransform = Matrix(attributes[i]['transform'])
+        path = Path(paths[i].d()) * pathTransform
+        path = Path(path.d())
+
+        print(path)
+        style = 0
+
+        if 'style' in attributes[i].keys():
+            style = styleParse(attributes[i]['style'])
 
         if 'fill' in attributes[i].keys():
             filled = attributes[i]['fill'] != 'none' and attributes[i]['fill'] != ''
+        elif 'style' in attributes[i].keys():
+            filled = style['fill'] != 'none' and style['fill'] != ''
         else:
             filled = False
 
         if 'stroke' in attributes[i].keys():
             stroked = attributes[i]['stroke'] != 'none' and attributes[i]['stroke'] != ''
+        elif 'style' in attributes[i].keys():
+            stroked = style['stroke'] != 'none' and style['stroke'] != ''
         else:
             stroked = False
 
         if not filled and not stroked:
             continue  # not drawable (clip path?)
+
         anyVisiblePaths = True
         l = path.length()
         divs = round(l * SUBSAMPLING)
         if divs < 3:
             divs = 3
-        print(divs)
         maxLen = l * 1.5 * SCALE / divs
         p = path.point(0)
         p = complex(p.real * SCALE, p.imag * SCALE)
@@ -230,6 +273,7 @@ def drawSVG(svg_attributes, attributes, paths):
         s = 0
         while s <= divs:
             p = path.point(s * (1 / divs))
+            #print(p)
             p = complex(p.real * SCALE, p.imag * SCALE)
             if dist(p, last) > maxLen:
                 if len(points) > 1:
@@ -252,8 +296,10 @@ def drawSVG(svg_attributes, attributes, paths):
             polys = unpackPoly(polys)
 
         for points in polys:
+
             if len(points) < 2:
                 return
+                
             scriptLine = ''
             if filled:
                 # re-add final point so we loop around
@@ -273,9 +319,12 @@ def drawSVG(svg_attributes, attributes, paths):
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
 
             for p in points:
-                scriptLine += f'({round(p.real, 6)}mm {round(exportHeight - p.imag, 6)}mm) '
+                precisionX = '{0:.6f}'.format(round(p.real, 6))
+                precisionY = '{0:.6f}'.format(round(exportHeight - p.imag, 6))
+                scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
 
             scriptLine += ';'
+            print(scriptLine)
             out += scriptLine + '\n'
 
         i += 1
@@ -294,7 +343,6 @@ def convert(filename):
 
     try:
         f = open(path_to_script + "/output.scr", 'w')
-        print(drawSVG(svg_attributes, attributes, paths))  # output to terminal
         f.write(drawSVG(svg_attributes, attributes, paths))
         f.close
 
