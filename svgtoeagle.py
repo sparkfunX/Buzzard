@@ -6,7 +6,7 @@ import os
 import sys
 
 SCALE = 1 / 90
-SUBSAMPLING = 1  # subsampling of SVG path
+SUBSAMPLING = 1.5  # subsampling of SVG path
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
 TRACEWIDTH = '0.1'  # in mm
@@ -220,9 +220,12 @@ def drawSVG(svg_attributes, attributes, paths):
     if len(paths) == 0:
         print("No paths found. Did you use 'Object to path' in Inkscape?")
     anyVisiblePaths = False
+
     i = 0
     while i < len(paths):
         #path = paths[i]
+
+        print(str(i) + '/' + str(len(paths)))
 
         # Apply the tranform from this svg object to actually transform the points
         # We need the Matrix object from svgelements but we can only matrix multiply with
@@ -236,7 +239,6 @@ def drawSVG(svg_attributes, attributes, paths):
         path = Path(paths[i].d()) * pathTransform
         path = Path(path.d())
 
-        print(path)
         style = 0
 
         if 'style' in attributes[i].keys():
@@ -257,6 +259,7 @@ def drawSVG(svg_attributes, attributes, paths):
             stroked = False
 
         if not filled and not stroked:
+            i += 1
             continue  # not drawable (clip path?)
 
         anyVisiblePaths = True

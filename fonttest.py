@@ -1,5 +1,6 @@
 import argparse
-from svgpathtools import wsvg, Line, QuadraticBezier, CubicBezier, Path
+from svgpathtools import Line, QuadraticBezier, CubicBezier, Path, Arc
+from svgelements import Path as elPath, Matrix
 from freetype import Face
 import svgwrite
 import bezier
@@ -20,18 +21,77 @@ class boundingBox:
     self.xMin = xMin
     self.yMin = yMin
 
-# 
+parser = argparse.ArgumentParser(
+    description='SparkFun Buzzard Label Generator')
+parser.add_argument('labelText', help='Text to write on the label')
+parser.add_argument('-f', dest='fontName', default='Roboto',
+                    help='Typeface to use when rendering the label')
+args = parser.parse_args()
+
+# Set up some variables
 dwg = svgwrite.Drawing(filename='text.svg', debug=True)
-inString = 'helloworld!'
-xOffset = 0
+inString = args.labelText
+xOffset = 100
 strIdx = 0
 charSizeX = 8
 charSizeY = 8 
+baseline = 170
+leftCap = ''
+rightCap = ''
+removeTag = False
 glyphBounds = []
-face = Face('./Roboto.ttf')
-#face = Face('./FredokaOne-Regular.ttf')
+finalSegments = []
+face = Face('./typeface/' + args.fontName +'.ttf')
 face.set_char_size(charSizeX,charSizeY,200,200)
 
+# Detect and Remove tag style indicators
+if inString[0] == '(':
+    leftCap = 'round'
+    removeTag = True
+elif inString[0] == '[':
+    leftCap = 'square'
+    removeTag = True
+elif inString[0] == '<':
+    leftCap = 'pointer'
+    removeTag = True
+elif inString[0] == '>':
+    leftCap = 'flagtail'
+    removeTag = True
+elif inString[0] == '/':
+    leftCap = 'fslash'
+    removeTag = True
+elif inString[0] == '\\':
+    leftCap = 'bslash'
+    removeTag = True
+
+if removeTag:
+    inString = inString[1:]
+
+removeTag = False
+
+if inString[-1] == ')':
+    rightCap = 'round'
+    removeTag = True
+elif inString[-1] == ']':
+    rightCap = 'square'
+    removeTag = True
+elif inString[-1] == '>':
+    rightCap = 'pointer'
+    removeTag = True
+elif inString[-1] == '<':
+    rightCap = 'flagtail'
+    removeTag = True
+elif inString[-1] == '/':
+    rightCap = 'fslash'
+    removeTag = True
+elif inString[-1] == '\\':
+    rightCap = 'bslash'
+    removeTag = True    
+
+if removeTag:
+    inString = inString[:len(inString)-1]
+
+# Draw and compose the glyph portion of the tag 
 for charIdx in range(len(inString)):
     face.load_char(inString[charIdx])
     outline = face.glyph.outline
@@ -67,19 +127,13 @@ for charIdx in range(len(inString)):
 
         for segment in segments:
             if len(segment) == 2:
-                #print('Found Bezier with ' + str(len(segment)) + ' control points. Rendering as a line.')
                 paths.append(Line(start=tuple_to_imag(segment[0]),
                                 end=tuple_to_imag(segment[1])))
 
             elif len(segment) == 3:
-                #print('Found Bezier with ' + str(len(segment)) + ' control points. Rendering as a quadratic.')
                 paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
                                             control=tuple_to_imag(segment[1]),
                                             end=tuple_to_imag(segment[2])))
-            #else: 
-                #print('Found Bezier with ' + str(len(segment)) + ' control points. THIS WASN\'T SUPPOSED TO HAPPEN!!!')
-                #print(segment)
-
         start = end + 1
 
     # Derive bounding box
@@ -99,39 +153,88 @@ for charIdx in range(len(inString)):
 
     glyphBounds.append(box)
     path = Path(*paths)
-    pathObj = dwg.add(dwg.path(path.d()))
-    pathObj.translate(xOffset)
-    pathObj['fill'] = "#000000"
+    pathTransform = Matrix.translate(xOffset, baseline-box.yMax)
+    path = elPath(path.d()) * pathTransform
+    path = elPath(path.d())
+    finalSegments.append(path)
     xOffset += 30
     xOffset += (glyphBounds[charIdx].xMax - glyphBounds[charIdx].xMin)
-    #print('Width of glyph \"' + inString[charIdx] + '\" is ' + str((glyphBounds[charIdx].xMax - glyphBounds[charIdx].xMin)))
     strIdx += 1
 
-dwg['width'] = xOffset
+if leftCap == '' and rightCap == '':
+    for i in range(len(finalSegments)):
+        svgObj = dwg.add(dwg.path(finalSegments[i].d()))
+        svgObj['fill'] = "#000000"
+else:
+    #draw the outline of the label as a filled shape and 
+    #subtract each latter from it
+    tagPaths = []
+    if rightCap == 'round':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Arc(start=complex(xOffset,0), radius=complex(100,100), rotation=180, large_arc=1, sweep=1, end=complex(xOffset,200)))
+    elif rightCap == 'square':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+50,0)))
+        tagPaths.append(Line(start=complex(xOffset+50,0), end=complex(xOffset+50,200)))
+        tagPaths.append(Line(start=complex(xOffset+50,200), end=complex(xOffset,200)))        
+    elif rightCap == 'pointer':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,100)))
+        tagPaths.append(Line(start=complex(xOffset+100,100), end=complex(xOffset,200)))
+    elif rightCap == 'flagtail':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,0)))
+        tagPaths.append(Line(start=complex(xOffset+100,0), end=complex(xOffset,100)))
+        tagPaths.append(Line(start=complex(xOffset,100), end=complex(xOffset+100,200)))        
+        tagPaths.append(Line(start=complex(xOffset+100,200), end=complex(xOffset,200))) 
+    elif rightCap == 'fslash':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,0)))        
+        tagPaths.append(Line(start=complex(xOffset+100,0), end=complex(xOffset,200))) 
+    elif rightCap == 'bslash':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,200)))        
+        tagPaths.append(Line(start=complex(xOffset+100,200), end=complex(xOffset,200))) 
+    elif rightCap == '' and leftCap != '':
+        tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
+        tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset,200)))
+
+    if leftCap == 'round':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Arc(start=complex(100,200), radius=complex(100,100), rotation=180, large_arc=0, sweep=1, end=complex(100,0)))
+    elif leftCap == 'square':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(50,200)))
+        tagPaths.append(Line(start=complex(50,200), end=complex(50,0)))
+        tagPaths.append(Line(start=complex(50,0), end=complex(100,0)))     
+    elif leftCap == 'pointer':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(0,100)))
+        tagPaths.append(Line(start=complex(0,100), end=complex(100,0)))
+    elif leftCap == 'flagtail':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(0,200)))
+        tagPaths.append(Line(start=complex(0,200), end=complex(100,100)))
+        tagPaths.append(Line(start=complex(100,100), end=complex(0,0)))
+        tagPaths.append(Line(start=complex(0,0), end=complex(100,0)))
+    elif leftCap == 'fslash':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(0,200)))
+        tagPaths.append(Line(start=complex(0,200), end=complex(100,0)))
+    elif leftCap == 'bslash':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(0,0)))
+        tagPaths.append(Line(start=complex(0,0), end=complex(100,0)))
+    elif leftCap == '' and rightCap != '':
+        tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
+        tagPaths.append(Line(start=complex(100,200), end=complex(100,0)))
+
+    path = Path(*tagPaths)
+    for i in range(len(finalSegments)):
+        path = elPath(path.d()+" "+finalSegments[i].reverse())
+    tagObj = dwg.add(dwg.path(path.d()))
+    tagObj['fill'] = "#000000"
+
+dwg['width'] = xOffset+100
 dwg['height'] = 200
 dwg.save()
-
-# ******************************************************************************
-#
-# Main program flow
-#
-# ******************************************************************************
-#if __name__ == '__main__':
-
-#    parser = argparse.ArgumentParser(
-#        description='SparkFun Buzzard Label Generator')
-
- #   parser.add_argument('fileToConvert', help='SVG file to convert')
-
- #   parser.add_argument('-s', dest='scaleFactor', default=300.0,
-                        #type=float, help='Scale factor. Larger')
-
- #   parser.add_argument('-l', dest='eagleLayerNumber', default=21,
-                        #type=int, help='Layer in EAGLE to create label into (default is tPlace)')
-
- #   parser.add_argument('-n', dest='signalName', default='GND',
-                       # help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
-
-  #  args = parser.parse_args()
-
-  #  convert(args.fileToConvert)
