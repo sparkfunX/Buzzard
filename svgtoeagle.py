@@ -6,7 +6,7 @@ import os
 import sys
 
 SCALE = 1 / 90
-SUBSAMPLING = 1.5  # subsampling of SVG path
+SUBSAMPLING = 1  # subsampling of SVG path
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
 TRACEWIDTH = '0.1'  # in mm
@@ -40,8 +40,7 @@ def isInside(point, poly):
         yi = poly[i].imag
         xj = poly[j].real
         yj = poly[j].imag
-        intersect = ((yi > y) != (yj > y)) and (
-            x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+        intersect = ((yi > y) != (yj > y)) and (x < ((xj - xi) * (y - yi) / (yj - yi) + xi))
         if intersect:
             inside = not inside
         j = i
@@ -88,11 +87,14 @@ def interpPt(path, idxa, idxb):
 # Some svg paths conatin multiple nested polygons. We need to open them and splice them together.
 def unpackPoly(poly):
     # ensure all polys are the right way around
+    if args.verbose:
+        print('...Unpacking ' + str(len(poly)) + ' Polygons')
     p = 0
     while p < len(poly):
-        print(polygonArea(poly[p]))
         if polygonArea(poly[p]) > 0:
             poly[p].reverse()
+            if args.verbose:
+                print('...Polygon #'+str(p)+' was backwards, reversed')
         p += 1
 
     finalPolys = [poly[0]]
@@ -134,8 +136,6 @@ def unpackPoly(poly):
                     b += 1
                 a += 1
 
-            print(path[minPath + 1:][0])
-
                 # splice the inner poly into the outer poly
                 # but we have to recess the two joins a little
                 # otherwise Eagle reports Invalid poly when filling
@@ -165,6 +165,7 @@ def unpackPoly(poly):
 
         p += 1
 
+    #print(finalPolys)
     return finalPolys
 
 
@@ -175,6 +176,7 @@ def drawSVG(svg_attributes, attributes, paths):
     global SUBSAMPLING
     global SIMPLIFY
     global SIMPLIFYHQ
+    global TRACEWIDTH
 
     out = ''
 
@@ -198,14 +200,17 @@ def drawSVG(svg_attributes, attributes, paths):
     if 'mm' in specifiedWidth:
         specifiedWidth = float(specifiedWidth.replace('mm', ''))
         SCALE = specifiedWidth / float(svgWidth)
-        print("SVG width detected in mm \\o/")
+        if args.verbose:
+            print("SVG width detected in mm \\o/")
     elif 'in' in specifiedWidth:
         specifiedWidth = float(specifiedWidth.replace('in', '')) * 25.4
         SCALE = specifiedWidth / float(svgWidth)
-        print("SVG width detected in inches")
+        if args.verbose:
+            print("SVG width detected in inches")
     else:
         SCALE = 1 / args.scaleFactor
-        print("SVG width not found")
+        if args.verbose:
+            print("SVG width not found, guessing based on scale factor")
         # DO SOMETHING HERE TO ESCAPE AND TELL THE USER THEY'RE BONED
 
     exportHeight = float(svgHeight) * SCALE
@@ -225,7 +230,8 @@ def drawSVG(svg_attributes, attributes, paths):
     while i < len(paths):
         #path = paths[i]
 
-        print(str(i) + '/' + str(len(paths)))
+        if args.verbose:
+            print('Translating Path ' + str(i+1) + ' of ' + str(len(paths)))
 
         # Apply the tranform from this svg object to actually transform the points
         # We need the Matrix object from svgelements but we can only matrix multiply with
@@ -236,6 +242,8 @@ def drawSVG(svg_attributes, attributes, paths):
         pathTransform = Matrix('')
         if 'transform' in attributes[i].keys():
             pathTransform = Matrix(attributes[i]['transform'])
+            if args.verbose:
+                print('...Applying Transforms')
         path = Path(paths[i].d()) * pathTransform
         path = Path(path.d())
 
@@ -262,12 +270,15 @@ def drawSVG(svg_attributes, attributes, paths):
             i += 1
             continue  # not drawable (clip path?)
 
+
+        SUBSAMPLING = args.subSampling
+        TRACEWIDTH = str(args.traceWidth)
         anyVisiblePaths = True
         l = path.length()
         divs = round(l * SUBSAMPLING)
         if divs < 3:
             divs = 3
-        maxLen = l * 1.5 * SCALE / divs
+        maxLen = l * 2 * SCALE / divs
         p = path.point(0)
         p = complex(p.real * SCALE, p.imag * SCALE)
         last = p
@@ -275,8 +286,7 @@ def drawSVG(svg_attributes, attributes, paths):
         points = []
         s = 0
         while s <= divs:
-            p = path.point(s * (1 / divs))
-            #print(p)
+            p = path.point(s * 1 / divs)
             p = complex(p.real * SCALE, p.imag * SCALE)
             if dist(p, last) > maxLen:
                 if len(points) > 1:
@@ -291,7 +301,6 @@ def drawSVG(svg_attributes, attributes, paths):
             s += 1
 
         if len(points) > 1:
-            # print(points)
             points = simplify(points, SIMPLIFY, SIMPLIFYHQ)
             polys.append(points)
 
@@ -327,7 +336,7 @@ def drawSVG(svg_attributes, attributes, paths):
                 scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
 
             scriptLine += ';'
-            print(scriptLine)
+            #print(scriptLine)
             out += scriptLine + '\n'
 
         i += 1
@@ -480,14 +489,23 @@ if __name__ == '__main__':
 
     parser.add_argument('fileToConvert', help='SVG file to convert')
 
-    parser.add_argument('-s', dest='scaleFactor', default=300.0,
+    parser.add_argument('-s', dest='scaleFactor', default=3.542,
                         type=float, help='Scale factor. Larger')
 
     parser.add_argument('-l', dest='eagleLayerNumber', default=21,
                         type=int, help='Layer in EAGLE to create label into (default is tPlace)')
 
+    parser.add_argument('-v', dest='verbose', default=False,
+                        help='Verbose mode', action='store_true')
+
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
+    
+    parser.add_argument('-u', dest='subSampling', default=1,
+                        type=float, help='Subsampling Rate')  
+
+    parser.add_argument('-t', dest='traceWidth', default=0.1,
+                        type=float, help='traceWidth in mm') 
 
     args = parser.parse_args()
 

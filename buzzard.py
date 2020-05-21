@@ -6,6 +6,8 @@ import svgwrite
 import bezier
 import numpy as np
 import math
+import subprocess
+import os
 
 # Takes an x/y tuple and returns a complex number
 def tuple_to_imag(t):
@@ -238,3 +240,6 @@ else:
 dwg['width'] = xOffset+100
 dwg['height'] = 200
 dwg.save()
+#dirpath = os.path.dirname(os.path.abspath(__file__))
+#subprocess.call([dirpath + "\\svgtoeagle.py", "text.svg"], shell=True)
+#os.remove(dirpath + "\\text.svg")
