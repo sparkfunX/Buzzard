@@ -8,6 +8,7 @@ import numpy as np
 import math
 import subprocess
 import os
+import sys
 
 # Takes an x/y tuple and returns a complex number
 def tuple_to_imag(t):
@@ -33,8 +34,9 @@ args = parser.parse_args()
 # Set up some variables
 dwg = svgwrite.Drawing(filename='text.svg', debug=True)
 inString = args.labelText
-xOffset = 100
 strIdx = 0
+xOffset = 100
+yOffset = 0
 charSizeX = 8
 charSizeY = 8 
 baseline = 170
@@ -43,8 +45,22 @@ rightCap = ''
 removeTag = False
 glyphBounds = []
 finalSegments = []
-face = Face('./typeface/' + args.fontName +'.ttf')
-face.set_char_size(charSizeX,charSizeY,200,200)
+
+try:
+    face = Face('./typeface/' + args.fontName + '.ttf')
+    face.set_char_size(charSizeX,charSizeY,200,200)
+except:
+    print("No Typeface found with the name " + args.fontName + ".ttf")
+    sys.exit(0)  # quit Python
+
+try: 
+    table = __import__('typeface.' + args.fontName, globals(), locals(), ['glyphPos'])
+    glyphPos = table.glyphPos
+    spaceDistance = table.spaceDistance
+except:
+    glyphPos = 0
+    spaceDistance = 60
+    print("No Position Table found for this typeface. Composition will be haphazard at best.")
 
 # Detect and Remove tag style indicators
 if inString[0] == '(':
@@ -95,6 +111,10 @@ if removeTag:
 
 # Draw and compose the glyph portion of the tag 
 for charIdx in range(len(inString)):
+    if inString[charIdx] == ' ':
+        glyphBounds.append(boundingBox(0,0,0,0))
+        xOffset += spaceDistance
+        continue
     face.load_char(inString[charIdx])
     outline = face.glyph.outline
     y = [t[1] for t in outline.points]
@@ -103,6 +123,7 @@ for charIdx in range(len(inString)):
     start, end = 0, 0
     paths = []
     box = 0
+    yOffset = 0
 
     for i in range(len(outline.contours)):
         end = outline.contours[i]
@@ -155,11 +176,16 @@ for charIdx in range(len(inString)):
 
     glyphBounds.append(box)
     path = Path(*paths)
-    pathTransform = Matrix.translate(xOffset, baseline-box.yMax)
+    if glyphPos != 0:
+        xOffset += glyphPos[inString[charIdx]].real
+        yOffset = glyphPos[inString[charIdx]].imag
+    pathTransform = Matrix.translate(xOffset, baseline+yOffset-box.yMax)
     path = elPath(path.d()) * pathTransform
     path = elPath(path.d())
     finalSegments.append(path)
     xOffset += 30
+    if glyphPos != 0:
+        xOffset -= glyphPos[inString[charIdx]].real
     xOffset += (glyphBounds[charIdx].xMax - glyphBounds[charIdx].xMin)
     strIdx += 1
 
