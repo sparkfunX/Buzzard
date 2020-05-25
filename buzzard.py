@@ -50,7 +50,7 @@ try:
     face = Face('./typeface/' + args.fontName + '.ttf')
     face.set_char_size(charSizeX,charSizeY,200,200)
 except:
-    print("No Typeface found with the name " + args.fontName + ".ttf")
+    print("WARN: No Typeface found with the name " + args.fontName + ".ttf")
     sys.exit(0)  # quit Python
 
 try: 
@@ -60,7 +60,8 @@ try:
 except:
     glyphPos = 0
     spaceDistance = 60
-    print("No Position Table found for this typeface. Composition will be haphazard at best.")
+    print("WARN: No Position Table found for this typeface. Composition will be haphazard at best.")
+    pass
 
 # Detect and Remove tag style indicators
 if inString[0] == '(':
@@ -177,15 +178,21 @@ for charIdx in range(len(inString)):
     glyphBounds.append(box)
     path = Path(*paths)
     if glyphPos != 0:
-        xOffset += glyphPos[inString[charIdx]].real
-        yOffset = glyphPos[inString[charIdx]].imag
+        try:
+            xOffset += glyphPos[inString[charIdx]].real
+            yOffset = glyphPos[inString[charIdx]].imag
+        except: 
+            pass
     pathTransform = Matrix.translate(xOffset, baseline+yOffset-box.yMax)
     path = elPath(path.d()) * pathTransform
     path = elPath(path.d())
     finalSegments.append(path)
     xOffset += 30
     if glyphPos != 0:
-        xOffset -= glyphPos[inString[charIdx]].real
+        try:
+            xOffset -= glyphPos[inString[charIdx]].real
+        except:
+            pass
     xOffset += (glyphBounds[charIdx].xMax - glyphBounds[charIdx].xMin)
     strIdx += 1
 
@@ -264,7 +271,7 @@ else:
     tagObj['fill'] = "#000000"
 
 dwg['width'] = xOffset+100
-dwg['height'] = 200
+dwg['height'] = 250
 dwg.save()
 #dirpath = os.path.dirname(os.path.abspath(__file__))
 #subprocess.call([dirpath + "\\svgtoeagle.py", "text.svg"], shell=True)
