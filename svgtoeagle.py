@@ -489,7 +489,7 @@ if __name__ == '__main__':
 
     parser.add_argument('fileToConvert', help='SVG file to convert')
 
-    parser.add_argument('-s', dest='scaleFactor', default=3.542,
+    parser.add_argument('-s', dest='scaleFactor', default=1,
                         type=float, help='Scale factor. Larger')
 
     parser.add_argument('-l', dest='eagleLayerNumber', default=21,
