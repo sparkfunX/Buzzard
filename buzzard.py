@@ -32,7 +32,7 @@ parser.add_argument('-f', dest='fontName', default='Roboto',
 args = parser.parse_args()
 
 # Set up some variables
-dwg = svgwrite.Drawing(filename='text.svg', debug=True)
+dwg = svgwrite.Drawing(filename=os.path.dirname(os.path.abspath(__file__)) + '/text.svg', debug=True)
 inString = args.labelText
 strIdx = 0
 xOffset = 100
