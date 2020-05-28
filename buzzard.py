@@ -47,7 +47,7 @@ glyphBounds = []
 finalSegments = []
 
 try:
-    face = Face('./typeface/' + args.fontName + '.ttf')
+    face = Face(os.path.dirname(os.path.abspath(__file__)) + '/typeface/' + args.fontName + '.ttf')
     face.set_char_size(charSizeX,charSizeY,200,200)
 except:
     print("WARN: No Typeface found with the name " + args.fontName + ".ttf")
