@@ -208,7 +208,7 @@ def drawSVG(svg_attributes, attributes, paths):
         if args.verbose:
             print("SVG width detected in inches")
     else:
-        SCALE = 1 / args.scaleFactor
+        SCALE = args.scaleFactor / 157 #157 was found emperically to match 0.04" text by default
         if args.verbose:
             print("SVG width not found, guessing based on scale factor")
         # DO SOMETHING HERE TO ESCAPE AND TELL THE USER THEY'RE BONED
@@ -331,8 +331,8 @@ def drawSVG(svg_attributes, attributes, paths):
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
 
             for p in points:
-                precisionX = '{0:.6f}'.format(round(p.real, 6))
-                precisionY = '{0:.6f}'.format(round(exportHeight - p.imag, 6))
+                precisionX = '{0:.2f}'.format(round(p.real, 6))
+                precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
                 scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
 
             scriptLine += ';'
@@ -501,10 +501,10 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
     
-    parser.add_argument('-u', dest='subSampling', default=1,
+    parser.add_argument('-u', dest='subSampling', default=0.1,
                         type=float, help='Subsampling Rate')  
 
-    parser.add_argument('-t', dest='traceWidth', default=0.1,
+    parser.add_argument('-t', dest='traceWidth', default=0.03,
                         type=float, help='traceWidth in mm') 
 
     args = parser.parse_args()
