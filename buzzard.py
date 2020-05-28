@@ -1,9 +1,9 @@
 import argparse
 from svgpathtools import Line, QuadraticBezier, CubicBezier, Path, Arc
 from svgelements import Path as elPath, Matrix
-from freetype import Face
+from freetype import Face #pip install freetype-py
 import svgwrite
-import bezier
+import bezier #pip install bezier
 import numpy as np
 import math
 import subprocess
