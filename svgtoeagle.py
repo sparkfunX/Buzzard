@@ -11,6 +11,7 @@ SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
 TRACEWIDTH = '0.1'  # in mm
 EAGLE_FORMAT = 'board'
+COMPILE_LIB = False
 
 # Use Pythagoras to find the distance between two points
 def dist(a, b):
@@ -148,16 +149,6 @@ def unpackPoly(poly):
             finalPolys[outerPolyIndex].append(interpPt(path, minPath, minPath - 1))
             finalPolys[outerPolyIndex].append(interpPt(outerPoly, minOuter, minOuter + 1))    
             finalPolys[outerPolyIndex].extend(outerPoly[minOuter + 1:])      
-
-            #finalPolys[outerPolyIndex].extend(
-            #    [interpPt(outerPoly, minOuter, minOuter - 1),
-            #     interpPt(path, minPath, minPath + 1),
-            #     path[minPath + 1:],
-            #     path[:minPath],
-            #     interpPt(path, minPath, minPath - 1),
-            #     interpPt(outerPoly, minOuter, minOuter + 1),
-            #     outerPoly[minOuter + 1:]]
-            #)
             
         else:
             # not inside, just add this poly
@@ -177,11 +168,17 @@ def drawSVG(svg_attributes, attributes, paths):
     global SIMPLIFY
     global SIMPLIFYHQ
     global TRACEWIDTH
+    global COMPILE_LIB
 
     out = ''
-
     svgWidth = 0
     svgHeight = 0
+
+    if args.libMode == 'lib' or args.libMode == 'ls':
+        EAGLE_FORMAT = 'library'
+
+    if args.libMode == 'lib':
+        COMPILE_LIB = True
 
     if 'viewBox' in svg_attributes.keys():
         if svg_attributes['viewBox'].split()[2] != '0':
@@ -353,15 +350,31 @@ def convert(filename):
 
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
-    try:
-        f = open(path_to_script + "/output.scr", 'w')
-        f.write(drawSVG(svg_attributes, attributes, paths))
-        f.close
+    if not COMPILE_LIB:
 
-    except:
-        print("Failed to create output file")
-        sys.exit(0)  # quit Python
+        try:
+            f = open(path_to_script + "/output.scr", 'w')
+            f.write(drawSVG(svg_attributes, attributes, paths))
+            f.close
 
+        except:
+            print("Failed to create output file")
+            sys.exit(0)  # quit Python
+
+    else:
+
+         try:
+            f = open(path_to_script + "/output.lbr", 'w')
+            f.write(writeLib(drawSVG(svg_attributes, attributes, paths)))
+            f.close
+
+        except:
+            print("Failed to create output file")
+            sys.exit(0)  # quit Python       
+
+def writeLib(scriptString):
+
+    
 
 ####################
 # SIMPLIFY
@@ -497,6 +510,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-v', dest='verbose', default=False,
                         help='Verbose mode', action='store_true')
+
+    parser.add_argument('-o', dest='outMode', default='board',
+                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file)')
 
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
