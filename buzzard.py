@@ -808,7 +808,7 @@ if __name__ == '__main__':
 
     parser.add_argument('labelText', help='Text to write on the label')
 
-    parser.add_argument('-f', dest='fontName', default='FredonkaOne',
+    parser.add_argument('-f', dest='fontName', default='FredokaOne',
                     help='Typeface to use when rendering the label')
 
     parser.add_argument('-s', dest='scaleFactor', default=0.04,
