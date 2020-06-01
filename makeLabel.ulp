@@ -36,6 +36,10 @@ string getProjectPath()
         schematic(B) return (filedir(B.name));
 }
 
+//add *@C:\Users\natha\Dropbox\Projects\Buzzard\output.lbr
+//If there is one item in lib, it will mouse populate
+//If there is more than one, a tree will be presented to use
+
 void createLabel()
 {
     //Convert forward slashes to back slashes so we can run system commands
@@ -44,14 +48,14 @@ void createLabel()
     string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
     //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
 
-    commandToRun += " & echo Running python script";
+    commandToRun += " & echo Generating labels";
 
     //Convert the arguments into a single string so we can pass it along to the python script
     string argList = "";
     for (int x = 1; x < argc; x++)
         argList += argv[x] + " ";
 
-    sprintf(s, "python \"%ssvgtoeagle.py\" %s", localDirectory, argList);
+    sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
     commandToRun += " & " + s;
 
     //dlgMessageBox(commandToRun);
@@ -61,8 +65,8 @@ void createLabel()
         exit(-1);
     }
 
-    //Python script should create a EAGLE friendly script file. Now run it.
-    sprintf(s, "SCRIPT %s;", localDirectory + "/output.scr");
+    //Python script should create a EAGLE friendly library file. Now run it.
+    sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
     exit(s);
 }
 
