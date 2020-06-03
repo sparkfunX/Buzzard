@@ -28,26 +28,36 @@ class boundingBox:
     self.xMin = xMin
     self.yMin = yMin
 
+# Global variables (most of these are rewritten by CLI args later)
 SCALE = 1 / 90
-SUBSAMPLING = 1  # subsampling of SVG path
+SUBSAMPLING = 1
 SIMPLIFY = 0.1 * SCALE
 SIMPLIFYHQ = False
-TRACEWIDTH = '0.1'  # in mm
+TRACEWIDTH = '0.1'
 
+# ******************************************************************************
+#
+# Create SVG Document containing properly formatted inString
+#
+#
 def renderLabel(inString):
-    dwg = svgwrite.Drawing()
-    strIdx = 0
-    xOffset = 100
-    yOffset = 0
-    charSizeX = 8
-    charSizeY = 8 
-    baseline = 170
-    leftCap = ''
-    rightCap = ''
-    removeTag = False
-    glyphBounds = []
-    finalSegments = []
+    dwg = svgwrite.Drawing()    # SVG drawing in memory
+    strIdx = 0                  # Used to iterate over inString
+    xOffset = 100               # Cumulative character placement offset
+    yOffset = 0                 # Cumulative character placement offset
+    charSizeX = 8               # Character size constant 
+    charSizeY = 8               # Character size constant 
+    baseline = 170              # Y value of text baseline
+    leftCap = ''                # Used to store cap shape for left side of tag
+    rightCap = ''               # Used to store cap shape for right side of tag
+    removeTag = False           # Track whether characters need to be removed from string ends
+    glyphBounds = []            # List of boundingBox objects to track rendered character size
+    finalSegments = []          # List of output paths 
+    escaped = False             # Track whether the current character was preceded by a '\'
+    lineover = False            # Track whether the current character needs to be lined over
+    lineoverList = []
 
+    # If we can't find the typeface that the user requested, we have to quit
     try:
         face = Face(os.path.dirname(os.path.abspath(__file__)) + '/typeface/' + args.fontName + '.ttf')
         face.set_char_size(charSizeX,charSizeY,200,200)
@@ -55,6 +65,7 @@ def renderLabel(inString):
         print("WARN: No Typeface found with the name " + args.fontName + ".ttf")
         sys.exit(0)  # quit Python
 
+    # If the typeface that the user requested exists, but there's no position table for it, we'll continue with a warning
     try: 
         table = __import__('typeface.' + args.fontName, globals(), locals(), ['glyphPos'])
         glyphPos = table.glyphPos
@@ -64,6 +75,23 @@ def renderLabel(inString):
         spaceDistance = 60
         print("WARN: No Position Table found for this typeface. Composition will be haphazard at best.")
         pass
+
+    # If there's lineover text, drop the text down to make room for the line
+    dropBaseline = False
+    a = False
+    b = False
+    x = 0
+    while x < len(inString):
+        if x > 0 and inString[x] == '\\':
+            a = True
+            if x != len(inString)-1:
+                x += 1
+        if inString[x] == '!' and not a:
+            dropBaseline = True
+        a = False
+        x += 1
+    if dropBaseline:
+        baseline = 190
 
     # Detect and Remove tag style indicators
     if inString[0] == '(':
@@ -114,12 +142,41 @@ def renderLabel(inString):
 
     # Draw and compose the glyph portion of the tag 
     for charIdx in range(len(inString)):
+        # Check whether this character is a space
         if inString[charIdx] == ' ':
-            glyphBounds.append(boundingBox(0,0,0,0))
+            glyphBounds.append(boundingBox(0,0,0,0)) 
             xOffset += spaceDistance
             continue
-        face.load_char(inString[charIdx])
-        outline = face.glyph.outline
+        # Check whether this character is a backslash that isn't escaped 
+        # and isn't the first character (denoting a backslash-shaped tag)
+        if inString[charIdx] == '\\' and charIdx > 0 and not escaped:
+            glyphBounds.append(boundingBox(0,0,0,0))
+            escaped = True
+            continue
+        # If this is a non-escaped '!' mark the beginning of lineover
+        if inString[charIdx] == '!' and not escaped:
+            glyphBounds.append(boundingBox(0,0,0,0))
+            lineover = True
+            # If we've hit the end of the string but not the end of the lineover
+            # go ahead and finish it out
+            if charIdx == len(inString)-1 and len(lineoverList) > 0:
+                linePaths = []
+                linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
+                linePaths.append(Line(start=complex(xOffset,10), end=complex(xOffset,30)))
+                linePaths.append(Line(start=complex(xOffset,30), end=complex(lineoverList[0], 30)))
+                linePaths.append(Line(start=complex(lineoverList[0], 30), end=complex(lineoverList[0], 10)))
+                linepath = Path(*linePaths)
+                linepath = elPath(linepath.d())
+                finalSegments.append(linepath)
+                lineover = False
+                lineoverList.clear()
+            continue
+        # All special cases end in 'continue' so if we've gotten here we can clear our flags      
+        if escaped:
+            escaped = False
+
+        face.load_char(inString[charIdx])   # Load character curves from font
+        outline = face.glyph.outline        # Save character curves to var
         y = [t[1] for t in outline.points]
         # flip the points
         outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
@@ -162,7 +219,7 @@ def renderLabel(inString):
                                                 end=tuple_to_imag(segment[2])))
             start = end + 1
 
-        # Derive bounding box
+        # Derive bounding box of character
         for segment in paths:
             i = 0
             while i < 10:
@@ -185,6 +242,22 @@ def renderLabel(inString):
                 yOffset = glyphPos[inString[charIdx]].imag
             except: 
                 pass
+        if lineover and len(lineoverList) == 0:
+            lineoverList.append(xOffset)
+            lineover = False
+            
+        if (lineover and len(lineoverList) > 0):
+            linePaths = []
+            linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
+            linePaths.append(Line(start=complex(xOffset,10), end=complex(xOffset,30)))
+            linePaths.append(Line(start=complex(xOffset,30), end=complex(lineoverList[0], 30)))
+            linePaths.append(Line(start=complex(lineoverList[0], 30), end=complex(lineoverList[0], 10)))
+            linepath = Path(*linePaths)
+            linepath = elPath(linepath.d())
+            finalSegments.append(linepath)
+            lineover = False
+            lineoverList.clear()
+            
         pathTransform = Matrix.translate(xOffset, baseline+yOffset-box.yMax)
         path = elPath(path.d()) * pathTransform
         path = elPath(path.d())
@@ -216,22 +289,24 @@ def renderLabel(inString):
             tagPaths.append(Line(start=complex(xOffset+50,200), end=complex(xOffset,200)))        
         elif rightCap == 'pointer':
             tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
-            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,100)))
-            tagPaths.append(Line(start=complex(xOffset+100,100), end=complex(xOffset,200)))
+            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+50,0)))
+            tagPaths.append(Line(start=complex(xOffset+50,0), end=complex(xOffset+100,100)))
+            tagPaths.append(Line(start=complex(xOffset+100,100), end=complex(xOffset+50,200)))
+            tagPaths.append(Line(start=complex(xOffset+50,200), end=complex(xOffset,200)))
         elif rightCap == 'flagtail':
             tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
             tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,0)))
-            tagPaths.append(Line(start=complex(xOffset+100,0), end=complex(xOffset,100)))
-            tagPaths.append(Line(start=complex(xOffset,100), end=complex(xOffset+100,200)))        
+            tagPaths.append(Line(start=complex(xOffset+100,0), end=complex(xOffset+50,100)))
+            tagPaths.append(Line(start=complex(xOffset+50,100), end=complex(xOffset+100,200)))        
             tagPaths.append(Line(start=complex(xOffset+100,200), end=complex(xOffset,200))) 
         elif rightCap == 'fslash':
             tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
-            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,0)))        
-            tagPaths.append(Line(start=complex(xOffset+100,0), end=complex(xOffset,200))) 
+            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+50,0)))        
+            tagPaths.append(Line(start=complex(xOffset+50,0), end=complex(xOffset,200))) 
         elif rightCap == 'bslash':
             tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
-            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+100,200)))        
-            tagPaths.append(Line(start=complex(xOffset+100,200), end=complex(xOffset,200))) 
+            tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset+50,200)))        
+            tagPaths.append(Line(start=complex(xOffset+50,200), end=complex(xOffset,200))) 
         elif rightCap == '' and leftCap != '':
             tagPaths.append(Line(start=complex(100,0), end=complex(xOffset,0)))
             tagPaths.append(Line(start=complex(xOffset,0), end=complex(xOffset,200)))
@@ -246,22 +321,24 @@ def renderLabel(inString):
             tagPaths.append(Line(start=complex(50,0), end=complex(100,0)))     
         elif leftCap == 'pointer':
             tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
-            tagPaths.append(Line(start=complex(100,200), end=complex(0,100)))
-            tagPaths.append(Line(start=complex(0,100), end=complex(100,0)))
+            tagPaths.append(Line(start=complex(100,200), end=complex(50,200)))
+            tagPaths.append(Line(start=complex(50,200), end=complex(0,100)))
+            tagPaths.append(Line(start=complex(0,100), end=complex(50,0)))
+            tagPaths.append(Line(start=complex(50,0), end=complex(100,0)))
         elif leftCap == 'flagtail':
             tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
             tagPaths.append(Line(start=complex(100,200), end=complex(0,200)))
-            tagPaths.append(Line(start=complex(0,200), end=complex(100,100)))
-            tagPaths.append(Line(start=complex(100,100), end=complex(0,0)))
+            tagPaths.append(Line(start=complex(0,200), end=complex(50,100)))
+            tagPaths.append(Line(start=complex(50,100), end=complex(0,0)))
             tagPaths.append(Line(start=complex(0,0), end=complex(100,0)))
         elif leftCap == 'fslash':
             tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
-            tagPaths.append(Line(start=complex(100,200), end=complex(0,200)))
-            tagPaths.append(Line(start=complex(0,200), end=complex(100,0)))
+            tagPaths.append(Line(start=complex(100,200), end=complex(50,200)))
+            tagPaths.append(Line(start=complex(50,200), end=complex(100,0)))
         elif leftCap == 'bslash':
             tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
-            tagPaths.append(Line(start=complex(100,200), end=complex(0,0)))
-            tagPaths.append(Line(start=complex(0,0), end=complex(100,0)))
+            tagPaths.append(Line(start=complex(100,200), end=complex(50,0)))
+            tagPaths.append(Line(start=complex(50,0), end=complex(100,0)))
         elif leftCap == '' and rightCap != '':
             tagPaths.append(Line(start=complex(xOffset,200), end=complex(100,200)))
             tagPaths.append(Line(start=complex(100,200), end=complex(100,0)))
@@ -422,7 +499,13 @@ def unpackPoly(poly):
     #print(finalPolys)
     return finalPolys
 
-
+#
+#
+# ******************************************************************************
+#
+#   Convert SVG paths to various EAGLE polygon formats
+#
+#
 def drawSVG(svg_attributes, attributes, paths):
 
     global SCALE
@@ -497,6 +580,22 @@ def drawSVG(svg_attributes, attributes, paths):
         path = elPath(paths[i].d()) * pathTransform
         path = elPath(path.d())
 
+        # Another stage of transforms that gets applied to all paths
+        # in order to shift the label around the origin
+
+        tx = {
+            'l':0,
+            'c':0-(float(svgWidth)/2),
+            'r':0-float(svgWidth)
+        }
+        ty = {
+            't':250,
+            'c':150,
+            'b':50
+        }
+        path = elPath(paths[i].d()) * Matrix.translate(tx[args.originPos[1]],ty[args.originPos[0]])
+        path = elPath(path.d())
+
         style = 0
 
         if 'style' in attributes[i].keys():
@@ -519,7 +618,6 @@ def drawSVG(svg_attributes, attributes, paths):
         if not filled and not stroked:
             i += 1
             continue  # not drawable (clip path?)
-
 
         SUBSAMPLING = args.subSampling
         TRACEWIDTH = str(args.traceWidth)
@@ -683,13 +781,17 @@ def cleanName(name):
 
     return name
 
-####################
-# SIMPLIFY
-####################
+#
+#
+# ******************************************************************************
+#
+#   Python port of:
+#   Simplify.js, a high-performance JS polyline simplification library
+#   Vladimir Agafonkin, 2013
+#   mourner.github.io/simplify-js
+#
 
 # square distance from a point to a segment
-
-
 def getSqSegDist(p, p1, p2):
 
     x = p1.real
@@ -714,7 +816,6 @@ def getSqSegDist(p, p1, p2):
 
     return dx * dx + dy * dy
 
-
 # basic distance-based simplification
 def simplifyRadialDist(points, sqTolerance):
 
@@ -737,7 +838,6 @@ def simplifyRadialDist(points, sqTolerance):
         newPoints.append(point)
 
     return newPoints
-
 
 # simplification using optimized Douglas-Peucker algorithm with recursion elimination
 def simplifyDouglasPeucker(points, sqTolerance):
@@ -783,7 +883,6 @@ def simplifyDouglasPeucker(points, sqTolerance):
 
     return newPoints
 
-
 # both algorithms combined for awesome performance
 def simplify(points, tolerance, highestQuality):
 
@@ -795,12 +894,13 @@ def simplify(points, tolerance, highestQuality):
     points = simplifyDouglasPeucker(points, sqTolerance)
 
     return points
+#
+#
+# ******************************************************************************
+#
+#   Main program flow
+#
 
-# ******************************************************************************
-#
-# Main program flow
-#
-# ******************************************************************************
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -808,30 +908,36 @@ if __name__ == '__main__':
 
     parser.add_argument('labelText', help='Text to write on the label')
 
-    parser.add_argument('-f', dest='fontName', default='Roboto',
+    parser.add_argument('-f', dest='fontName', default='FredokaOne',
                     help='Typeface to use when rendering the label')
 
     parser.add_argument('-s', dest='scaleFactor', default=0.04,
                         type=float, help='Text Height in inches (same as EAGLE text size value)')
 
     parser.add_argument('-l', dest='eagleLayerNumber', default=21,
-                        type=int, help='Layer in EAGLE to create label into (default is tPlace)')
+                        type=int, help='Layer in EAGLE to create label into (default is tPlace layer 21)')
 
     parser.add_argument('-v', dest='verbose', default=False,
-                        help='Verbose mode', action='store_true')
+                        help='Verbose mode (helpful for debugging)', action='store_true')
 
-    parser.add_argument('-o', dest='outMode', default='b',
+    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib'],
                         help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file)')
 
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
     
     parser.add_argument('-u', dest='subSampling', default=0.1,
-                        type=float, help='Subsampling Rate')  
+                        type=float, help='Subsampling Rate (smaller values provide smoother curves with larger output)')  
 
     parser.add_argument('-t', dest='traceWidth', default=0.03,
-                        type=float, help='traceWidth in mm') 
+                        type=float, help='Trace width in mm') 
+
+    parser.add_argument('-a', dest='originPos', default='cl', choices=['tl', 'cl', 'bl', 'tc', 'cc', 'bc', 'tr', 'cr', 'br'],
+                        help='Footprint anchor position (default:cl)')
 
     args = parser.parse_args()
 
     generate(args.labelText)
+
+    #
+    # ******************************************************************************

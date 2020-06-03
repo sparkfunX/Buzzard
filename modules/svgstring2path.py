@@ -1,3 +1,7 @@
+# This is a conglomeration of modules removed from https://github.com/mathandy/svgpathtools 
+# in order to support a modified 'svg2paths' method called 'string2paths' which takes an
+# svg string as an argument instead of a filename.
+
 from svgpathtools import Line, QuadraticBezier, CubicBezier, Path, Arc
 from xml.dom.minidom import parseString, parse
 from os import path as os_path, getcwd
