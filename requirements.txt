@@ -1,0 +1,4 @@
+svgpathtools
+svgelements
+freetype-py
+bezier
