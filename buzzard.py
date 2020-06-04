@@ -11,6 +11,7 @@ import os
 import sys
 import re
 import xml.etree.ElementTree as XMLET
+import shlex
 
 svgstring2path = __import__('modules.svgstring2path', globals(), locals(), ['string2paths'])
 string2paths = svgstring2path.string2paths
@@ -862,6 +863,23 @@ def cleanName(name):
 
     return name
 
+def generateCollection(script):
+    # the file 'script' contains label-specific options. certain options are not processed per-label such as:
+    # -o: outMode (the entire collection will be output using one mode)
+    def mergeGlobalArgs(args):
+        merged = args
+        merged.outMode = cli_args.outMode
+        merged.verbose = cli_args.verbose
+        return merged
+
+    with open(script, 'r') as f_in:
+        collection = f_in.read().split('\n')
+    
+    for element in collection:
+        args = mergeGlobalArgs(parser.parse_args(shlex.split(element)))
+        print('generating label with args: ', args)
+        # generate(args.labelText)
+        
 #
 #
 # ******************************************************************************
@@ -987,7 +1005,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='SparkFun Buzzard Label Generator')
 
-    parser.add_argument('labelText', help='Text to write on the label')
+    parser.add_argument('labelText', help='Text to write on the label [path to collection script when using -c]')
 
     parser.add_argument('-f', dest='fontName', default='FredokaOne',
                     help='Typeface to use when rendering the label')
@@ -1022,9 +1040,16 @@ if __name__ == '__main__':
     parser.add_argument('-d', dest='destination', default='output',
                     help='Output destination filename (extension depends on -o flag)')
 
-    args = parser.parse_args()
+    parser.add_argument('-c', dest='useCollection', default=False, action='store_true',
+                        help='If specified labelText is used as a path to collection script (a text list of labels and options to create)')
 
-    generate(args.labelText)
+    cli_args = parser.parse_args()
+    args = cli_args                                 # forward cli_args -> args for normal operation
+
+    if cli_args.useCollection:
+        generateCollection(cli_args.labelText)      # labelText should be path to collection
+    else:                
+        generate(args.labelText)
 
     #
     # ******************************************************************************

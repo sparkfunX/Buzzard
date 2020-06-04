@@ -1,0 +1,2 @@
+"tgt swd clk" -s 0.04
+"tgt boot" -s 0.04 -a tl
