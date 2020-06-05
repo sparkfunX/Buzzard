@@ -702,12 +702,14 @@ def drawSVG(svg_attributes, attributes, paths):
     return out
 
 
-def generate(labelString):
+def generate(args):
+
+    print('generating label with args: ', args)
 
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
     if args.outMode != 'lib':
-        paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
+        paths, attributes, svg_attributes = string2paths(renderLabel(args.labelText).tostring())
 
         try:
             f = open(path_to_script + "/" + args.destination + ".scr", 'w')
@@ -719,7 +721,7 @@ def generate(labelString):
             sys.exit(0)  # quit Python
 
     else:
-        labelStrings = labelString.split(",")
+        labelStrings = args.labelText.split(",")
         scripts = []
 
         for string in labelStrings:
@@ -730,12 +732,14 @@ def generate(labelString):
             output_path = path_to_script + "/" + args.destination + ".lbr"
             
             if args.writeMode == 'a':
+                print('appending')
                 new_contents = appendLib(scripts, labelStrings, output_path)
 
                 with open(output_path, 'w') as f:
                     f.write(new_contents)
 
             else:
+                print('overwriting')
                 f = open(output_path, 'w')
                 f.write(writeLib(scripts, labelStrings))
                 f.close
@@ -870,15 +874,20 @@ def generateCollection(script):
         merged = args
         merged.outMode = cli_args.outMode
         merged.verbose = cli_args.verbose
+        merged.destination = cli_args.destination
+        merged.writeMode = 'a'
         return merged
 
     with open(script, 'r') as f_in:
         collection = f_in.read().split('\n')
     
-    for element in collection:
+    for index, element in enumerate(collection):
+
         args = mergeGlobalArgs(parser.parse_args(shlex.split(element)))
-        print('generating label with args: ', args)
-        # generate(args.labelText)
+        if index == 0:
+            args.writeMode = 'w' # overwrite on first call for blank slate
+
+        generate(args)
         
 #
 #
