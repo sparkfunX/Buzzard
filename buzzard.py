@@ -919,6 +919,7 @@ def generateCollection(script):
         if index == 0:
             args.writeMode = 'w' # overwrite on first call for blank slate
 
+        print('[' + str(index+1) + '/' + str(len(collection)) + '] Generating: ' + args.labelText)
         generate(args.labelText)
         
 #
