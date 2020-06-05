@@ -1054,7 +1054,7 @@ if __name__ == '__main__':
     if cli_args.useCollection:
         generateCollection(cli_args.labelText)      # labelText should be path to collection
     else:                
-        generate(args.labelText)
+        generate(cli_args)
 
     #
     # ******************************************************************************
