@@ -730,14 +730,12 @@ def generate(args):
             output_path = path_to_script + "/" + args.destination + ".lbr"
             
             if args.writeMode == 'a':
-                print('appending')
                 new_contents = appendLib(scripts, labelStrings, output_path)
 
                 with open(output_path, 'w') as f:
                     f.write(new_contents)
 
             else:
-                print('overwriting')
                 f = open(output_path, 'w')
                 f.write(writeLib(scripts, labelStrings))
                 f.close
