@@ -910,6 +910,9 @@ def generateCollection(script):
 
     with open(script, 'r') as f_in:
         collection = f_in.read().split('\n')
+
+    # filter out blank commands
+    collection = list(filter(lambda e: e != '', collection))
     
     for index, element in enumerate(collection):
         mergeLocalArgs(parser.parse_args(shlex.split(element)))
