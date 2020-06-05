@@ -55,7 +55,7 @@ optional arguments:
   ### Multiple Tags
   
   When using the `-o lib` output format, multiple comma-separated tags can be generated. If you need multiple tags with individual
-  formatting, try collections mode! 
+  formatting, try [collections mode](https://github.com/sparkfunX/Buzzard/tree/python#generate-collections)! 
   
   ### Overlining 
   
