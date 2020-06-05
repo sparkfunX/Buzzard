@@ -704,8 +704,6 @@ def drawSVG(svg_attributes, attributes, paths):
 
 def generate(labelString):
 
-    print(args)
-
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
     if args.outMode != 'lib':
