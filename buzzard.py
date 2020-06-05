@@ -702,12 +702,14 @@ def drawSVG(svg_attributes, attributes, paths):
     return out
 
 
-def generate(args):
+def generate(labelString):
+
+    print(args)
 
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
     if args.outMode != 'lib':
-        paths, attributes, svg_attributes = string2paths(renderLabel(args.labelText).tostring())
+        paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
 
         try:
             f = open(path_to_script + "/" + args.destination + ".scr", 'w')
@@ -719,7 +721,7 @@ def generate(args):
             sys.exit(0)  # quit Python
 
     else:
-        labelStrings = args.labelText.split(",")
+        labelStrings = labelString.split(",")
         scripts = []
 
         for string in labelStrings:
@@ -884,26 +886,37 @@ def cleanName(name):
     return name
 
 def generateCollection(script):
+    cli_args = args # store arguments as given on the command line
+
     # the file 'script' contains label-specific options. certain options are not processed per-label such as:
     # -o: outMode (the entire collection will be output using one mode)
-    def mergeGlobalArgs(args):
-        merged = args
-        merged.outMode = cli_args.outMode
-        merged.verbose = cli_args.verbose
-        merged.destination = cli_args.destination
-        merged.writeMode = 'a'
-        return merged
+    def mergeLocalArgs(local_args):
+        # global options for collection:
+        # args.outMode
+        # args.verbose
+        # args.destination
+        # args.useCollection
+
+        args.writeMode = 'a'
+
+        args.eagleLayerNumber = local_args.eagleLayerNumber
+        args.fontName = local_args.fontName
+        args.labelText = local_args.labelText
+        args.originPos = local_args.originPos
+        args.scaleFactor = local_args.scaleFactor
+        args.signalName = local_args.signalName
+        args.subSampling = local_args.subSampling
+        args.traceWidth = local_args.traceWidth
 
     with open(script, 'r') as f_in:
         collection = f_in.read().split('\n')
     
     for index, element in enumerate(collection):
-
-        args = mergeGlobalArgs(parser.parse_args(shlex.split(element)))
+        mergeLocalArgs(parser.parse_args(shlex.split(element)))
         if index == 0:
             args.writeMode = 'w' # overwrite on first call for blank slate
 
-        generate(args)
+        generate(args.labelText)
         
 #
 #
@@ -1068,13 +1081,12 @@ if __name__ == '__main__':
     parser.add_argument('-c', dest='useCollection', default=False, action='store_true',
                         help='If specified labelText is used as a path to collection script (a text list of labels and options to create)')
 
-    cli_args = parser.parse_args()
-    args = cli_args                                 # forward cli_args -> args for normal operation
+    args = parser.parse_args()
 
-    if cli_args.useCollection:
-        generateCollection(cli_args.labelText)      # labelText should be path to collection
+    if args.useCollection:
+        generateCollection(args.labelText)      # labelText should be path to collection
     else:                
-        generate(cli_args)
+        generate(args.labelText)
 
     #
     # ******************************************************************************
