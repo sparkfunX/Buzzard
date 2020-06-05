@@ -853,6 +853,26 @@ def appendLib(scriptStrings, labelStrings, file):
         
         serialNum += 1
 
+    # make sure there are newlines after every element
+    # good solution from SO: https://stackoverflow.com/questions/3095434/inserting-newlines-in-xml-file-generated-via-xml-etree-elementtree-in-python/33956544#33956544
+    def indent(elem, level=0):
+        indent_string="" # you can choose various symbols / strings to indent with... use "" for no indentation
+        i = "\n" + level*indent_string
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + indent_string
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                indent(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+    
+    indent(root)
+
     return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE eagle SYSTEM \"eagle.dtd\">\n" + XMLET.tostring(root, encoding='unicode', method='xml')
 
 def cleanName(name):
