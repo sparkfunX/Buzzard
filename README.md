@@ -24,6 +24,11 @@ optional arguments:
   -t TRACEWIDTH         Trace width in mm
   -a {tl,cl,bl,tc,cc,bc,tr,cr,br}
                         Footprint anchor position (default:cl)
+  -w {w,a}              Output writing mode (default:w)
+  -d DESTINATION        Output destination filename (extension depends on -o
+                        flag)
+  -c                    If specified labelText is used as a path to collection
+                        script (a text list of labels and options to create)                      
   ```
   
   ## labelText
@@ -49,7 +54,8 @@ optional arguments:
   
   ### Multiple Tags
   
-  When using the `-o lib` output format, multiple comma-separated tags can be generated. 
+  When using the `-o lib` output format, multiple comma-separated tags can be generated. If you need multiple tags with individual
+  formatting, try collections mode! 
   
   ### Overlining 
   
@@ -130,3 +136,19 @@ optional arguments:
   cr - center right
   br - bottom right
   ```
+  
+  ## Output Writing Mode
+
+  By default, buzzard.py with overwrite the output file. Running with the `-w a` option, however, will run buzzard.py in "append mode," 
+  adding the specified tag to the existing output file.
+  
+  ## Destination Filename
+  
+  Using the `-d` flag will allow you to specify the name of the output file. The file extension will automatically be selected based on
+  the output format.
+  
+  ## Generate Collections
+  
+  Passing the `-c` flag will run buzzard.py in collection mode. Instead of passing a comma-separated collection of strings, you may pass 
+  the path to a text file containing the strings that you wish to generate. In collection mode, each tag can be generated with its own
+  properties. An example collection.txt may be found in the ./tests/ directory
