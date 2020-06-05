@@ -1,0 +1,4 @@
+"buzzard" -s 0.04
+"is" -s 0.04 -a tl
+"pretty" -s 0.03
+"slick" -s 0.03 -a tl -f Roboto

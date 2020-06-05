@@ -10,6 +10,8 @@ import subprocess
 import os
 import sys
 import re
+import xml.etree.ElementTree as XMLET
+import shlex
 
 svgstring2path = __import__('modules.svgstring2path', globals(), locals(), ['string2paths'])
 string2paths = svgstring2path.string2paths
@@ -702,13 +704,13 @@ def drawSVG(svg_attributes, attributes, paths):
 
 def generate(labelString):
 
-    if args.outMode != 'lib':
+    path_to_script = os.path.dirname(os.path.abspath(__file__))
 
-        path_to_script = os.path.dirname(os.path.abspath(__file__))   
+    if args.outMode != 'lib':
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
 
         try:
-            f = open(path_to_script + "/output.scr", 'w')
+            f = open(path_to_script + "/" + args.destination + ".scr", 'w')
             f.write(drawSVG(svg_attributes, attributes, paths))
             f.close
 
@@ -717,8 +719,6 @@ def generate(labelString):
             sys.exit(0)  # quit Python
 
     else:
-
-        path_to_script = os.path.dirname(os.path.abspath(__file__)) 
         labelStrings = labelString.split(",")
         scripts = []
 
@@ -727,9 +727,18 @@ def generate(labelString):
             scripts.append(drawSVG(svg_attributes, attributes, paths))
 
         try:
-            f = open(path_to_script + "/output.lbr", 'w')
-            f.write(writeLib(scripts, labelStrings))
-            f.close
+            output_path = path_to_script + "/" + args.destination + ".lbr"
+            
+            if args.writeMode == 'a':
+                new_contents = appendLib(scripts, labelStrings, output_path)
+
+                with open(output_path, 'w') as f:
+                    f.write(new_contents)
+
+            else:
+                f = open(output_path, 'w')
+                f.write(writeLib(scripts, labelStrings))
+                f.close
 
         except:
             print("Failed to create output file")
@@ -773,6 +782,99 @@ def writeLib(scriptStrings, labelStrings):
 
     return lbrFile
 
+def appendLib(scriptStrings, labelStrings, file):
+
+    template = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE eagle SYSTEM \"eagle.dtd\">\n<eagle version=\"7.7.0\">\n<drawing>\n<settings>\n<setting alwaysvectorfont=\"no\"/>\n<setting verticaltext=\"up\"/>\n</settings>\n<grid distance=\"1\" unitdist=\"mm\" unit=\"mm\" style=\"lines\" multiple=\"1\" display=\"yes\" altdistance=\"0.1\" altunitdist=\"mm\" altunit=\"mm\"/>\n<layers>\n<layer number=\"1\" name=\"Top\" color=\"4\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"2\" name=\"Route2\" color=\"1\" fill=\"3\" visible=\"no\" active=\"yes\"/>\n<layer number=\"3\" name=\"Route3\" color=\"4\" fill=\"3\" visible=\"no\" active=\"yes\"/>\n<layer number=\"4\" name=\"Route4\" color=\"1\" fill=\"4\" visible=\"no\" active=\"yes\"/>\n<layer number=\"5\" name=\"Route5\" color=\"4\" fill=\"4\" visible=\"no\" active=\"yes\"/>\n<layer number=\"6\" name=\"Route6\" color=\"1\" fill=\"8\" visible=\"no\" active=\"yes\"/>\n<layer number=\"7\" name=\"Route7\" color=\"4\" fill=\"8\" visible=\"no\" active=\"yes\"/>\n<layer number=\"8\" name=\"Route8\" color=\"1\" fill=\"2\" visible=\"no\" active=\"yes\"/>\n<layer number=\"9\" name=\"Route9\" color=\"4\" fill=\"2\" visible=\"no\" active=\"yes\"/>\n<layer number=\"10\" name=\"Route10\" color=\"1\" fill=\"7\" visible=\"no\" active=\"yes\"/>\n<layer number=\"11\" name=\"Route11\" color=\"4\" fill=\"7\" visible=\"no\" active=\"yes\"/>\n<layer number=\"12\" name=\"Route12\" color=\"1\" fill=\"5\" visible=\"no\" active=\"yes\"/>\n<layer number=\"13\" name=\"Route13\" color=\"4\" fill=\"5\" visible=\"no\" active=\"yes\"/>\n<layer number=\"14\" name=\"Route14\" color=\"1\" fill=\"6\" visible=\"no\" active=\"yes\"/>\n<layer number=\"15\" name=\"Route15\" color=\"4\" fill=\"6\" visible=\"no\" active=\"yes\"/>\n<layer number=\"16\" name=\"Bottom\" color=\"1\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"17\" name=\"Pads\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"18\" name=\"Vias\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"19\" name=\"Unrouted\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"20\" name=\"Dimension\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"21\" name=\"tPlace\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"22\" name=\"bPlace\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"23\" name=\"tOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"24\" name=\"bOrigins\" color=\"15\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"25\" name=\"tNames\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"26\" name=\"bNames\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"27\" name=\"tValues\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"28\" name=\"bValues\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"29\" name=\"tStop\" color=\"7\" fill=\"3\" visible=\"no\" active=\"yes\"/>\n<layer number=\"30\" name=\"bStop\" color=\"7\" fill=\"6\" visible=\"no\" active=\"yes\"/>\n<layer number=\"31\" name=\"tCream\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"/>\n<layer number=\"32\" name=\"bCream\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"/>\n<layer number=\"33\" name=\"tFinish\" color=\"6\" fill=\"3\" visible=\"no\" active=\"yes\"/>\n<layer number=\"34\" name=\"bFinish\" color=\"6\" fill=\"6\" visible=\"no\" active=\"yes\"/>\n<layer number=\"35\" name=\"tGlue\" color=\"7\" fill=\"4\" visible=\"no\" active=\"yes\"/>\n<layer number=\"36\" name=\"bGlue\" color=\"7\" fill=\"5\" visible=\"no\" active=\"yes\"/>\n<layer number=\"37\" name=\"tTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"38\" name=\"bTest\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"39\" name=\"tKeepout\" color=\"4\" fill=\"11\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"40\" name=\"bKeepout\" color=\"1\" fill=\"11\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"41\" name=\"tRestrict\" color=\"4\" fill=\"10\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"42\" name=\"bRestrict\" color=\"1\" fill=\"10\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"43\" name=\"vRestrict\" color=\"2\" fill=\"10\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"44\" name=\"Drills\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"45\" name=\"Holes\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"46\" name=\"Milling\" color=\"3\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"47\" name=\"Measures\" color=\"7\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"48\" name=\"Document\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"49\" name=\"Reference\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"51\" name=\"tDocu\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"52\" name=\"bDocu\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"90\" name=\"Modules\" color=\"5\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"91\" name=\"Nets\" color=\"2\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"92\" name=\"Busses\" color=\"1\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"93\" name=\"Pins\" color=\"2\" fill=\"1\" visible=\"no\" active=\"yes\"/>\n<layer number=\"94\" name=\"Symbols\" color=\"4\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"95\" name=\"Names\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"96\" name=\"Values\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"97\" name=\"Info\" color=\"7\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n<layer number=\"98\" name=\"Guide\" color=\"6\" fill=\"1\" visible=\"yes\" active=\"yes\"/>\n</layers>\n<library>\n<packages>\n</packages>\n<symbols>\n</symbols>\n<devicesets>\n</devicesets>\n</library>\n</drawing>\n</eagle>\n"
+    # end_num_re = re.compile('[0-9]*$')
+    end_num_re = re.compile('[0-9]')
+
+
+    if os.path.exists(file):
+        tree = XMLET.parse(file)
+        root = tree.getroot()
+    else:
+        root = XMLET.fromstring(template)
+
+    lastSerialNum = None
+    
+    # find out what serial number to use at the beginning
+    symbols = next(root.iter('symbols'))
+    for symbol in symbols:
+        matches = end_num_re.search(symbol.attrib["name"])
+        if matches != None:
+            num = int(matches.group())
+
+            if lastSerialNum == None:
+                lastSerialNum = num + 1
+            else:
+                if num >= lastSerialNum:
+                    lastSerialNum = num + 1
+    
+    if lastSerialNum == None:
+        lastSerialNum = 0
+
+    serialNum = lastSerialNum
+
+    # Write Packages
+    packages = next(root.iter('packages'))
+    for i in range(len(scriptStrings)):
+        element = XMLET.SubElement(packages, 'package')
+        element.attrib = {"name" : cleanName(labelStrings[i].upper()) + str(serialNum)}
+        subroot = XMLET.fromstring("<root>" + scriptStrings[i] + "</root>")
+        for subelement in subroot:
+            element.append(subelement)
+
+        serialNum += 1
+
+    serialNum = lastSerialNum
+
+    # Write Symbols
+    symbols = next(root.iter('symbols'))
+    for i in range(len(scriptStrings)):
+        element = XMLET.SubElement(symbols, 'symbol')
+        element.attrib = {"name" : cleanName(labelStrings[i].upper()) + str(serialNum)}
+        subroot = XMLET.fromstring("<root>" + "<text x=\"0\" y=\"0\" size=\"1.778\" layer=\"94\">" + cleanName(labelStrings[i]) + "</text>" + "</root>")
+        for subelement in subroot:
+            element.append(subelement)
+
+        serialNum += 1
+
+    serialNum = lastSerialNum
+
+    # Write Devicesets
+    devicesets = next(root.iter('devicesets'))
+    for i in range(len(scriptStrings)):
+        element = XMLET.SubElement(devicesets, 'deviceset')
+        element.attrib = {"name" : cleanName(labelStrings[i].upper()) + str(serialNum)}
+        subroot = XMLET.fromstring("<root>" + "<gates>\n<gate name=\"G$1\" symbol=\"" + cleanName(labelStrings[i].upper()) + str(serialNum) + "\" x=\"0\" y=\"0\"/>\n</gates>\n<devices>\n<device name=\"\" package=\"" + cleanName(labelStrings[i].upper()) + str(serialNum) + "\">\n<technologies>\n<technology name=\"\"/>\n</technologies>\n</device>\n</devices>\n" + "</root>")
+        for subelement in subroot:
+            # print(subelement)
+            element.append(subelement)
+        
+        serialNum += 1
+
+    # make sure there are newlines after every element
+    # good solution from SO: https://stackoverflow.com/questions/3095434/inserting-newlines-in-xml-file-generated-via-xml-etree-elementtree-in-python/33956544#33956544
+    def indent(elem, level=0):
+        indent_string="" # you can choose various symbols / strings to indent with... use "" for no indentation
+        i = "\n" + level*indent_string
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + indent_string
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                indent(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i
+    
+    indent(root)
+
+    return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE eagle SYSTEM \"eagle.dtd\">\n" + XMLET.tostring(root, encoding='unicode', method='xml')
+
 def cleanName(name):
 
     name = name.replace(' ', '_')
@@ -781,6 +883,39 @@ def cleanName(name):
 
     return name
 
+def generateCollection(script):
+    cli_args = args # store arguments as given on the command line
+
+    # the file 'script' contains label-specific options. certain options are not processed per-label such as:
+    # -o: outMode (the entire collection will be output using one mode)
+    def mergeLocalArgs(local_args):
+        # global options for collection:
+        # args.outMode
+        # args.verbose
+        # args.destination
+        # args.useCollection
+
+        args.writeMode = 'a'
+
+        args.eagleLayerNumber = local_args.eagleLayerNumber
+        args.fontName = local_args.fontName
+        args.labelText = local_args.labelText
+        args.originPos = local_args.originPos
+        args.scaleFactor = local_args.scaleFactor
+        args.signalName = local_args.signalName
+        args.subSampling = local_args.subSampling
+        args.traceWidth = local_args.traceWidth
+
+    with open(script, 'r') as f_in:
+        collection = f_in.read().split('\n')
+    
+    for index, element in enumerate(collection):
+        mergeLocalArgs(parser.parse_args(shlex.split(element)))
+        if index == 0:
+            args.writeMode = 'w' # overwrite on first call for blank slate
+
+        generate(args.labelText)
+        
 #
 #
 # ******************************************************************************
@@ -906,7 +1041,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='SparkFun Buzzard Label Generator')
 
-    parser.add_argument('labelText', help='Text to write on the label')
+    parser.add_argument('labelText', help='Text to write on the label [path to collection script when using -c]')
 
     parser.add_argument('-f', dest='fontName', default='FredokaOne',
                     help='Typeface to use when rendering the label')
@@ -935,9 +1070,21 @@ if __name__ == '__main__':
     parser.add_argument('-a', dest='originPos', default='cl', choices=['tl', 'cl', 'bl', 'tc', 'cc', 'bc', 'tr', 'cr', 'br'],
                         help='Footprint anchor position (default:cl)')
 
+    parser.add_argument('-w', dest='writeMode', default='w', choices=['w', 'a'],
+                        help='Output writing mode (default:w)')
+
+    parser.add_argument('-d', dest='destination', default='output',
+                    help='Output destination filename (extension depends on -o flag)')
+
+    parser.add_argument('-c', dest='useCollection', default=False, action='store_true',
+                        help='If specified labelText is used as a path to collection script (a text list of labels and options to create)')
+
     args = parser.parse_args()
 
-    generate(args.labelText)
+    if args.useCollection:
+        generateCollection(args.labelText)      # labelText should be path to collection
+    else:                
+        generate(args.labelText)
 
     #
     # ******************************************************************************
