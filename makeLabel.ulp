@@ -1,0 +1,80 @@
+#usage "en: <b>Create a polygon based label using SparkFun's Buzzard system."
+"<p>Usage: run makeLabel</p>"
+    "<p>Author: <author>Nathan Seidle</author><br />"
+    "Version: <em>1.0</em></p>"
+
+    /*
+
+    run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg -s 300
+
+
+*/
+
+    string commandToRun;
+string s;
+
+//Change any / in a string to \
+//Useful for directory structure before calling a cmd
+string convertForwardToBackSlashes(string thing)
+{
+    //Convert forward slashes to back slashes so we can run system command
+    int pos = strrchr(thing, '/');
+    while (pos >= 0)
+    {
+        //thing = strsub(thing, 0, pos) + "\\\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
+        thing = strsub(thing, 0, pos) + "\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
+        pos = strrchr(thing, '/');                                                    //Look for the next forward slash
+    }
+    return (thing);
+}
+
+string getProjectPath()
+{
+    if (board)
+        board(B) return (filedir(B.name));
+    if (schematic)
+        schematic(B) return (filedir(B.name));
+}
+
+//add *@C:\Users\natha\Dropbox\Projects\Buzzard\output.lbr
+//If there is one item in lib, it will mouse populate
+//If there is more than one, a tree will be presented to use
+
+void createLabel()
+{
+    //Convert forward slashes to back slashes so we can run system commands
+    string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
+
+    string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
+    //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
+
+    commandToRun += " & echo Generating labels";
+
+    //Convert the arguments into a single string so we can pass it along to the python script
+    string argList = "";
+    for (int x = 1; x < argc; x++)
+        argList += argv[x] + " ";
+
+    sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
+    commandToRun += " & " + s;
+
+    //dlgMessageBox(commandToRun);
+    if (system(commandToRun) != 0)
+    {
+        dlgMessageBox("Error: Command failed.", "OK");
+        exit(-1);
+    }
+
+    //Python script should create a EAGLE friendly library file. Now run it.
+    sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
+    exit(s);
+}
+
+if (board)
+{
+    createLabel();
+}
+else
+{
+    dlgMessageBox("Run this ULP from a board");
+}
