@@ -1,4 +1,7 @@
 # SparkFun Buzzard Label Generator
+
+If you're looking for legacy buzzard, it is still live at [github.io](https://sparkfunx.github.io/Buzzard/) and the source can be found in the `gh-pages` branch of this repo. Below is the documentation for `Buzzard.py`. For extensive legacy documentation, see the wiki.
+
 ```
 usage: buzzard.py [-h] [-f FONTNAME] [-s SCALEFACTOR] [-l EAGLELAYERNUMBER]
                   [-v] [-o {b,ls,lib}] [-n SIGNALNAME] [-u SUBSAMPLING]
