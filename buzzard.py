@@ -1067,7 +1067,7 @@ if __name__ == '__main__':
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
     
     parser.add_argument('-u', dest='subSampling', default=0.1,
-                        type=float, help='Subsampling Rate (smaller values provide smoother curves with larger output)')  
+                        type=float, help='Subsampling Rate (larger values provide smoother curves with more points)')  
 
     parser.add_argument('-t', dest='traceWidth', default=0.03,
                         type=float, help='Trace width in mm') 
