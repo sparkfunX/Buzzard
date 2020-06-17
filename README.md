@@ -22,8 +22,8 @@ optional arguments:
                         'lib'=library file)
   -n SIGNALNAME         Signal name for polygon. Required if layer is not 21
                         (default is 'GND')
-  -u SUBSAMPLING        Subsampling Rate (smaller values provide smoother
-                        curves with larger output)
+  -u SUBSAMPLING        Subsampling Rate (larger values provide smoother curves 
+                        with more points)
   -t TRACEWIDTH         Trace width in mm
   -a {tl,cl,bl,tc,cc,bc,tr,cr,br}
                         Footprint anchor position (default:cl)
