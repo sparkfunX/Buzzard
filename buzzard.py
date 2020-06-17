@@ -353,6 +353,9 @@ def renderLabel(inString):
 
     dwg['width'] = xOffset+100
     dwg['height'] = 250
+
+    #dwg.saveas('out.svg')
+
     return dwg
 
 # Use Pythagoras to find the distance between two points
@@ -423,7 +426,7 @@ def interpPt(path, idxa, idxb):
     dy = b.imag - a.imag
     d = math.sqrt(dx * dx + dy * dy)
     if amt > d:
-        return []  # return nothing - will just end up using the last point
+        return  # return nothing - will just end up using the last point
     return complex(a.real + (dx * amt / d), a.imag + (dy * amt / d))
 
 
@@ -445,7 +448,6 @@ def unpackPoly(poly):
     p = 1
     while p < len(poly):
         path = poly[p]
-
         outerPolyIndex = 'undefined'
         i = 0
         while i < len(finalPolys):
@@ -484,13 +486,17 @@ def unpackPoly(poly):
                 # otherwise Eagle reports Invalid poly when filling
                 # the top layer
             finalPolys[outerPolyIndex] = outerPoly[0:minOuter]
-            finalPolys[outerPolyIndex].append(interpPt(outerPoly, minOuter, minOuter - 1))
-            finalPolys[outerPolyIndex].append(interpPt(path, minPath, minPath + 1))
+            stub = interpPt(outerPoly, minOuter, minOuter - 1)
+            (finalPolys[outerPolyIndex].append(stub) if stub is not None else None)
+            stub = interpPt(path, minPath, minPath + 1)
+            (finalPolys[outerPolyIndex].append(stub) if stub is not None else None)
             finalPolys[outerPolyIndex].extend(path[minPath + 1:])
             finalPolys[outerPolyIndex].extend(path[:minPath])
-            finalPolys[outerPolyIndex].append(interpPt(path, minPath, minPath - 1))
-            finalPolys[outerPolyIndex].append(interpPt(outerPoly, minOuter, minOuter + 1))    
-            finalPolys[outerPolyIndex].extend(outerPoly[minOuter + 1:])      
+            stub = interpPt(path, minPath, minPath - 1)
+            (finalPolys[outerPolyIndex].append(stub) if stub is not None else None)
+            stub = interpPt(outerPoly, minOuter, minOuter + 1)
+            (finalPolys[outerPolyIndex].append(stub) if stub is not None else None)  
+            finalPolys[outerPolyIndex].extend(outerPoly[minOuter + 1:])     
             
         else:
             # not inside, just add this poly
@@ -642,7 +648,6 @@ def drawSVG(svg_attributes, attributes, paths):
                 if len(points) > 1:
                     points = simplify(points, SIMPLIFY, SIMPLIFYHQ)
                     polys.append(points)
-
                 points = [p]
             else:
                 points.append(p)
@@ -651,7 +656,7 @@ def drawSVG(svg_attributes, attributes, paths):
             s += 1
 
         if len(points) > 1:
-            points = simplify(points, SIMPLIFY, SIMPLIFYHQ)
+            points = simplify(points, SIMPLIFY, SIMPLIFYHQ)          
             polys.append(points)
 
         if filled:
