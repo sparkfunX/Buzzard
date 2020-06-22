@@ -1066,7 +1066,7 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
     
-    parser.add_argument('-u', dest='subSampling', default=0.1,
+    parser.add_argument('-u', dest='subSampling', default=0.01,
                         type=float, help='Subsampling Rate (larger values provide smoother curves with more points)')  
 
     parser.add_argument('-t', dest='traceWidth', default=0.03,
