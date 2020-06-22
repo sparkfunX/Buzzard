@@ -1066,10 +1066,10 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
     
-    parser.add_argument('-u', dest='subSampling', default=0.01,
+    parser.add_argument('-u', dest='subSampling', default=0.1,
                         type=float, help='Subsampling Rate (larger values provide smoother curves with more points)')  
 
-    parser.add_argument('-t', dest='traceWidth', default=0.03,
+    parser.add_argument('-t', dest='traceWidth', default=0.01,
                         type=float, help='Trace width in mm') 
 
     parser.add_argument('-a', dest='originPos', default='cl', choices=['tl', 'cl', 'bl', 'tc', 'cc', 'bc', 'tr', 'cr', 'br'],
