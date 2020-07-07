@@ -808,7 +808,6 @@ def appendLib(scriptStrings, labelStrings, file):
         matches = end_num_re.search(symbol.attrib["name"])
         if matches != None:
             num = int(matches.group())
-            print("Instance of " + symbol.attrib["name"] + " found with sn#" + matches.group())
 
             if lastSerialNum == None:
                 lastSerialNum = num + 1
