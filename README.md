@@ -72,7 +72,7 @@ optional arguments:
   
   ### Literal Backslashes
   
-  If you want to use the literal "\\" character in your tag, it should be escaped with a leading backslash, i.e. "\\\"
+  If you want to use the literal "\\" character in your tag, it should be escaped with a leading backslash, i.e. "\\\\"
   A backslash in the first position of a tag string will always be interpreted as a tag shape indicator.
   
   ## FONTNAME
