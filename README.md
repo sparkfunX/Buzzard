@@ -110,7 +110,7 @@ optional arguments:
   
   Library package mode will generate a file called `output.lbr` which is an EAGLE library file containing the specified tag/tags
   
-  ## SINGALNAME
+  ## SIGNALNAME
   
   This argument defines the EAGLE signal name of the output, which is only required for metal layers. It is `GND` by default.
   
