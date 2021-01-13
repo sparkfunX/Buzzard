@@ -443,6 +443,24 @@ def unpackPoly(poly):
                 print('...Polygon #'+str(p)+' was backwards, reversed')
         p += 1
 
+    # check for polys that are within more than 1 other poly,
+    # extract them now, then we append them later
+    # This isn't a perfect solution and only handles a single nesting
+    extraPolys = []
+    polyTmp    = []
+    for j in range(len(poly)):
+        c = 0
+        for k in range(len(poly)):
+            if j == k:
+                continue
+            if isInside(poly[j][0], poly[k]):
+                c += 1
+        if c > 1:
+            extraPolys.append(poly[j])
+        else:
+            polyTmp.append(poly[j])
+
+    poly = polyTmp
     finalPolys = [poly[0]]
 
     p = 1
@@ -505,7 +523,7 @@ def unpackPoly(poly):
         p += 1
 
     #print(finalPolys)
-    return finalPolys
+    return finalPolys + extraPolys
 
 #
 #
