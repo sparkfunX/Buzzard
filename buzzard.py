@@ -729,7 +729,16 @@ def generate(labelString):
 
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
-    if args.outMode != 'lib':
+    if args.stdout:
+        paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
+        try:
+            print(drawSVG(svg_attributes, attributes, paths))
+        except:
+            print("Failed to output")
+            sys.exit(0)  # quit Python
+
+
+    elif args.outMode != 'lib':
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
 
         try:
@@ -1101,6 +1110,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', dest='destination', default='output',
                     help='Output destination filename (extension depends on -o flag)')
+
+    parser.add_argument('-stdout', dest='stdout', default=False, action='store_true',
+                    help='If Specified output is written to stdout')
 
     parser.add_argument('-c', dest='useCollection', default=False, action='store_true',
                         help='If specified labelText is used as a path to collection script (a text list of labels and options to create)')
