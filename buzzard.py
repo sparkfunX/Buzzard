@@ -581,6 +581,10 @@ def drawSVG(svg_attributes, attributes, paths):
     if args.outMode == "ls":
         out += "CHANGE layer " + str(args.eagleLayerNumber) + \
             "; CHANGE pour solid; Grid mm; SET WIRE_BEND 2;\n"
+    if args.outMode == "ki":
+        out += "(footprint \"buzzardLabel\"\n" + \
+            " (layer \"F.Cu\")\n" + \
+            " (attr board_only exclude_from_pos_files exclude_from_bom)\n"
 
     if len(paths) == 0:
         print("No paths found. Did you use 'Object to path' in Inkscape?")
@@ -697,13 +701,21 @@ def drawSVG(svg_attributes, attributes, paths):
                 if args.outMode == "ls":
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
 
-                for p in points:
-                    precisionX = '{0:.2f}'.format(round(p.real, 6))
-                    precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
-                    scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
+                if args.outMode != "ki":
+                    for p in points:
+                        precisionX = '{0:.2f}'.format(round(p.real, 6))
+                        precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
+                        scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
 
-                scriptLine += ';'
+                    scriptLine += ';'
 
+                elif args.outMode == "ki":
+                    scriptLine += " (fp_poly (pts"
+                    for p in points:
+                        precisionX = "{0:.2f}".format(round(p.real, 6))
+                        precisionY = "{0:.2f}".format(round(p.imag - exportHeight, 6))
+                        scriptLine += " (xy " + precisionX + " " + precisionY + ")"
+                    scriptLine += ") (layer \"F.SilkS\") (width 0.01) (fill solid))\n"
             else:
 
                 scriptLine += "<polygon width=\"" + TRACEWIDTH + "\" layer=\"" + str(args.eagleLayerNumber) + "\">\n"
@@ -721,6 +733,9 @@ def drawSVG(svg_attributes, attributes, paths):
 
     if not anyVisiblePaths:
         print("No paths with fills or strokes found.")
+
+    if args.outMode == "ki":
+        out += ')\n'
 
     return out
 
@@ -740,9 +755,10 @@ def generate(labelString):
 
     elif args.outMode != 'lib':
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
+        ext = '.scr' if args.outMode != "ki" else ".kicad_mod"
 
         try:
-            f = open(path_to_script + "/" + args.destination + ".scr", 'w')
+            f = open(path_to_script + "/" + args.destination + ext, 'w')
             f.write(drawSVG(svg_attributes, attributes, paths))
             f.close
 
@@ -1090,8 +1106,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', dest='verbose', default=False,
                         help='Verbose mode (helpful for debugging)', action='store_true')
 
-    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib'],
-                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file)')
+    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib', 'ki'],
+                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file, \'ki\'=KiCad footprint)')
 
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
