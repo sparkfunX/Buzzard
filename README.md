@@ -18,8 +18,8 @@ optional arguments:
   -l EAGLELAYERNUMBER   Layer in EAGLE to create label into (default is tPlace
                         layer 21)
   -v                    Verbose mode (helpful for debugging)
-  -o {b,ls,lib}         Output Mode ('b'=board script, 'ls'=library script,
-                        'lib'=library file)
+  -o {b,ls,lib}         Output Mode ('b'=board script, 'ls'=EAGLE library script,
+                        'lib'=EAGLE library file, 'ki'=KiCad footprint)
   -n SIGNALNAME         Signal name for polygon. Required if layer is not 21
                         (default is 'GND')
   -u SUBSAMPLING        Subsampling Rate (larger values provide smoother curves 
@@ -31,7 +31,9 @@ optional arguments:
   -d DESTINATION        Output destination filename (extension depends on -o
                         flag)
   -c                    If specified labelText is used as a path to collection
-                        script (a text list of labels and options to create)                      
+                        script (a text list of labels and options to create)    
+  -stdout               If specified output is written to stdout
+
   ```
   
   ## labelText
@@ -100,15 +102,20 @@ optional arguments:
   
   ### Board Script Mode
   
-  By default, buzzard.py will generate a file called `output.scr` which can be run in the board editor.
+  By default, buzzard.py will generate a file called `output.scr` which can be run in the EAGLE board editor.
   
   ### Library Script Mode
   
-  Library script mode will generate a file called `output.scr` which can be run in the library footprint editor.
+  Library script mode will generate a file called `output.scr` which can be run in the EAGLE library footprint editor.
   
   ### Library Package Mode
   
   Library package mode will generate a file called `output.lbr` which is an EAGLE library file containing the specified tag/tags
+
+  ### KiCad Footprint Mode
+
+  (Thank you gregdavill!)
+  KiCad footprint mode will generate a file called 'output.kicad_mod' which is a KiCad footprint file containing the specified tag
   
   ## SIGNALNAME
   
@@ -155,3 +162,8 @@ optional arguments:
   Passing the `-c` flag will run buzzard.py in collection mode. Instead of passing a comma-separated collection of strings, you may pass 
   the path to a text file containing the strings that you wish to generate. In collection mode, each tag can be generated with its own
   properties. An example collection.txt may be found in the ./tests/ directory
+
+  ## STDOUT Print Mode
+
+  If this argument is specified, the output will be written to stdout instead of a file. This is handy for piping to clipboard, etc.
+  
