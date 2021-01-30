@@ -443,6 +443,24 @@ def unpackPoly(poly):
                 print('...Polygon #'+str(p)+' was backwards, reversed')
         p += 1
 
+    # check for polys that are within more than 1 other poly,
+    # extract them now, then we append them later
+    # This isn't a perfect solution and only handles a single nesting
+    extraPolys = []
+    polyTmp    = []
+    for j in range(len(poly)):
+        c = 0
+        for k in range(len(poly)):
+            if j == k:
+                continue
+            if isInside(poly[j][0], poly[k]):
+                c += 1
+        if c > 1:
+            extraPolys.append(poly[j])
+        else:
+            polyTmp.append(poly[j])
+
+    poly = polyTmp
     finalPolys = [poly[0]]
 
     p = 1
@@ -505,7 +523,7 @@ def unpackPoly(poly):
         p += 1
 
     #print(finalPolys)
-    return finalPolys
+    return finalPolys + extraPolys
 
 #
 #
@@ -563,6 +581,10 @@ def drawSVG(svg_attributes, attributes, paths):
     if args.outMode == "ls":
         out += "CHANGE layer " + str(args.eagleLayerNumber) + \
             "; CHANGE pour solid; Grid mm; SET WIRE_BEND 2;\n"
+    if args.outMode == "ki":
+        out += "(footprint \"buzzardLabel\"\n" + \
+            " (layer \"F.Cu\")\n" + \
+            " (attr board_only exclude_from_pos_files exclude_from_bom)\n"
 
     if len(paths) == 0:
         print("No paths found. Did you use 'Object to path' in Inkscape?")
@@ -679,13 +701,21 @@ def drawSVG(svg_attributes, attributes, paths):
                 if args.outMode == "ls":
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
 
-                for p in points:
-                    precisionX = '{0:.2f}'.format(round(p.real, 6))
-                    precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
-                    scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
+                if args.outMode != "ki":
+                    for p in points:
+                        precisionX = '{0:.2f}'.format(round(p.real, 6))
+                        precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
+                        scriptLine += '(' + precisionX + 'mm ' + precisionY + 'mm) '
 
-                scriptLine += ';'
+                    scriptLine += ';'
 
+                elif args.outMode == "ki":
+                    scriptLine += " (fp_poly (pts"
+                    for p in points:
+                        precisionX = "{0:.2f}".format(round(p.real, 6))
+                        precisionY = "{0:.2f}".format(round(p.imag - exportHeight, 6))
+                        scriptLine += " (xy " + precisionX + " " + precisionY + ")"
+                    scriptLine += ") (layer \"F.SilkS\") (width 0.01) (fill solid))\n"
             else:
 
                 scriptLine += "<polygon width=\"" + TRACEWIDTH + "\" layer=\"" + str(args.eagleLayerNumber) + "\">\n"
@@ -704,6 +734,9 @@ def drawSVG(svg_attributes, attributes, paths):
     if not anyVisiblePaths:
         print("No paths with fills or strokes found.")
 
+    if args.outMode == "ki":
+        out += ')\n'
+
     return out
 
 
@@ -711,11 +744,21 @@ def generate(labelString):
 
     path_to_script = os.path.dirname(os.path.abspath(__file__))
 
-    if args.outMode != 'lib':
+    if args.stdout:
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
+        try:
+            print(drawSVG(svg_attributes, attributes, paths))
+        except:
+            print("Failed to output")
+            sys.exit(0)  # quit Python
+
+
+    elif args.outMode != 'lib':
+        paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
+        ext = '.scr' if args.outMode != "ki" else ".kicad_mod"
 
         try:
-            f = open(path_to_script + "/" + args.destination + ".scr", 'w')
+            f = open(path_to_script + "/" + args.destination + ext, 'w')
             f.write(drawSVG(svg_attributes, attributes, paths))
             f.close
 
@@ -1063,8 +1106,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', dest='verbose', default=False,
                         help='Verbose mode (helpful for debugging)', action='store_true')
 
-    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib'],
-                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file)')
+    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib', 'ki'],
+                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file, \'ki\'=KiCad footprint)')
 
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
@@ -1083,6 +1126,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-d', dest='destination', default='output',
                     help='Output destination filename (extension depends on -o flag)')
+
+    parser.add_argument('-stdout', dest='stdout', default=False, action='store_true',
+                    help='If Specified output is written to stdout')
 
     parser.add_argument('-c', dest='useCollection', default=False, action='store_true',
                         help='If specified labelText is used as a path to collection script (a text list of labels and options to create)')
