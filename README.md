@@ -2,6 +2,10 @@
 
 If you're looking for legacy buzzard, it is still live at [github.io](https://sparkfunx.github.io/Buzzard/) and the source can be found in the `gh-pages` branch of this repo. Below is the documentation for `Buzzard.py`. For extensive legacy documentation, see the wiki.
 
+  ## NEW! KiCad Support!
+  
+  Thanks to [Gregory Davill](https://github.com/gregdavill), Buzzard now generates tags in KiCad footprint format via the `-o ki` argument.
+
 ```
 usage: buzzard.py [-h] [-f FONTNAME] [-s SCALEFACTOR] [-l EAGLELAYERNUMBER]
                   [-v] [-o {b,ls,lib}] [-n SIGNALNAME] [-u SUBSAMPLING]
@@ -18,7 +22,7 @@ optional arguments:
   -l EAGLELAYERNUMBER   Layer in EAGLE to create label into (default is tPlace
                         layer 21)
   -v                    Verbose mode (helpful for debugging)
-  -o {b,ls,lib}         Output Mode ('b'=board script, 'ls'=EAGLE library script,
+  -o {b,ls,lib,ki}         Output Mode ('b'=board script, 'ls'=EAGLE library script,
                         'lib'=EAGLE library file, 'ki'=KiCad footprint)
   -n SIGNALNAME         Signal name for polygon. Required if layer is not 21
                         (default is 'GND')
