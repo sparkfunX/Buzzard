@@ -118,7 +118,6 @@ optional arguments:
 
   ### KiCad Footprint Mode
 
-  (Thank you gregdavill!)
   KiCad footprint mode will generate a file called 'output.kicad_mod' which is a KiCad footprint file containing the specified tag
   
   ## SIGNALNAME
