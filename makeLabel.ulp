@@ -10,8 +10,41 @@
 
 */
 
-    string commandToRun;
+string commandToRun;
 string s;
+string label;
+
+void inputWindow()
+{
+int Result = dlgDialog("Buzzard label generator") {
+  dlgHBoxLayout {
+    dlgStretch(1);
+    dlgLabel("Enter label which you want to make:");
+    dlgStretch(1);
+    }
+  dlgHBoxLayout {
+    dlgLabel("Label:");
+    dlgStringEdit(label);
+    }
+	  dlgHBoxLayout {
+	  int mirror = 0;
+int rotate = 0;
+int flip   = 0;
+/*
+dlgGroup("Optional arguments") {
+  dlgCheckBox("&Mirror", mirror);
+  dlgCheckBox("&Rotate", rotate);
+  dlgCheckBox("&Flip", flip);
+  } 
+	*/  }
+  dlgSpacing(10);
+  dlgHBoxLayout {
+    dlgStretch(1);
+    dlgPushButton("+OK")    dlgAccept();
+    dlgPushButton("Cancel") dlgReject();
+    }
+  }; 
+}
 
 //Change any / in a string to \
 //Useful for directory structure before calling a cmd
@@ -42,10 +75,13 @@ string getProjectPath()
 
 void createLabel()
 {
+inputWindow();
+dlgMessageBox(label);
+
     //Convert forward slashes to back slashes so we can run system commands
     string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
 
-    string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
+	string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
     //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
 
     commandToRun += " & echo Generating labels";
@@ -55,13 +91,15 @@ void createLabel()
     for (int x = 1; x < argc; x++)
         argList += argv[x] + " ";
 
-    sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
-    commandToRun += " & " + s;
+    //sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
+	sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
+    commandToRun += " & " + s + label;
 
-    //dlgMessageBox(commandToRun);
+    dlgMessageBox(commandToRun);
     if (system(commandToRun) != 0)
     {
-        dlgMessageBox("Error: Command failed.", "OK");
+        //dlgMessageBox(s);
+		dlgMessageBox(s, "Error: Command failed.", "OK");
         exit(-1);
     }
 
