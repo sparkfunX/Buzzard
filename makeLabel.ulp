@@ -21,10 +21,12 @@ string commandToRun;
 string s;
 string label;
 
-int startTag = 0;
-int endTag = 0;
+string startTag[] = {" ", "(", "/", "\\", ">", "["};
+string endTag[] = {" ", "(", "/", "\\", ">", "["};
 real scaleFactor = 0.04;
 string layers[] = {"1 -Top", "2 - Bottom", "21 - tPlace", "22 - bPlace", "25 - tNames", "26 - bNames"};
+string align[] = {"Botttom left", "Bottom center", "Bottom right", "Center", "Center left", "Top left", "Top center", "Top right"};
+string font[] = {"FredokaOne","Roboto"};
 int outputMode = 0;
 string signalName = "GND";
 real traceWidth = 0;
@@ -46,39 +48,35 @@ void inputWindow()
 }
 dlgHBoxLayout
 {
-    dlgLabel("Label:");
-    dlgStringEdit(label);
+    dlgGridLayout
+    {
+        dlgCell(0, 0) dlgGroup("Start flag")
+        {
+            dlgHBoxLayout
+            {
+                int selectedStart = 0;
+                dlgComboBox(startTag, selectedStart);
+            }
+        }
+        dlgCell(0, 1) dlgGroup("Label:")
+        {
+            dlgStringEdit(label);
+        }
+        dlgCell(0, 2) dlgGroup("End flag")
+        {
+            dlgHBoxLayout
+            {
+                int selectedEnd = 0;
+                dlgComboBox(endTag, selectedEnd);
+            }
+        }
+    }
 }
 dlgVBoxLayout
 {
     dlgGroup("Optional arguments")
     {
 
-        dlgGridLayout
-        {
-            dlgCell(0, 0) dlgGroup("Start flag")
-            {
-                dlgHBoxLayout
-                {
-                    dlgRadioButton("(", startTag);         // startTag = 0
-                    dlgRadioButton("/", startTag);         // startTag = 1
-                    dlgRadioButton("backslash", startTag); // startTag = 2
-                    dlgRadioButton(">", startTag);         // startTag = 3
-                    dlgRadioButton("[", startTag);         // startTag = 0
-                }
-            }
-            dlgCell(0, 1) dlgGroup("End flag")
-            {
-                dlgHBoxLayout
-                {
-                    dlgRadioButton("(", endTag);         // endTag = 0
-                    dlgRadioButton("/", endTag);         // endTag = 1
-                    dlgRadioButton("backslash", endTag); // endTag = 2
-                    dlgRadioButton("<", endTag);         // endTag = 3
-                    dlgRadioButton("[", endTag);         // endTag = 4
-                }
-            }
-        }
         dlgHBoxLayout
         {
 
@@ -127,15 +125,14 @@ dlgVBoxLayout
         dlgHBoxLayout
         {
             dlgLabel("Footprint  anchor position (-a):");
-            dlgRadioButton("tl", anchorPosition); //anchorPosition = 0
-            dlgRadioButton("cl", anchorPosition); //anchorPosition = 1
-            dlgRadioButton("bl", anchorPosition); //anchorPosition = 2
-            dlgRadioButton("tc", anchorPosition); //anchorPosition = 3
-            dlgRadioButton("cc", anchorPosition); //anchorPosition = 4
-            dlgRadioButton("bc", anchorPosition); //anchorPosition = 5
-            dlgRadioButton("tr", anchorPosition); //anchorPosition = 6
-            dlgRadioButton("cr", anchorPosition); //anchorPosition = 7
-            dlgRadioButton("br", anchorPosition); //anchorPosition = 8
+            int selectAlign = 4;
+            dlgComboBox(align, selectAlign);
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Font (-f):");
+            int selectFont = 0;
+            dlgComboBox(font, selectFont);
         }
     }
 }
@@ -231,8 +228,8 @@ void createLabel()
 
 if (board)
 {
-    //inputWindow();
-    createLabel();
+    inputWindow();
+    //createLabel();
 }
 else
 {
