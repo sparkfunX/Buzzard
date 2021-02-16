@@ -9,43 +9,164 @@
 
 
 */
+    /*
+*******************************************************************************
+*                           GLOBAL VARIABLES
+*******************************************************************************
+*/
+
+    string ConfigFileName = "buzzard_ulp.cfg";
 
 string commandToRun;
 string s;
 string label;
 
+int startTag = 0;
+int endTag = 0;
+real scaleFactor = 0.04;
+string layers[] = {"1 -Top", "2 - Bottom", "21 - tPlace", "22 - bPlace", "25 - tNames", "26 - bNames"};
+int outputMode = 0;
+string signalName = "GND";
+real traceWidth = 0;
+int anchorPosition = 1;
+int writeMode = 0;
+string outputFileName = "";
+
+//void
+
 void inputWindow()
 {
-int Result = dlgDialog("Buzzard label generator") {
-  dlgHBoxLayout {
-    dlgStretch(1);
+    int Result = dlgDialog("Buzzard label generator"){
+        dlgTabWidget{
+            dlgTabPage("Main"){
+                dlgHBoxLayout{
+                    dlgStretch(1);
     dlgLabel("Enter label which you want to make:");
     dlgStretch(1);
-    }
-  dlgHBoxLayout {
+}
+dlgHBoxLayout
+{
     dlgLabel("Label:");
     dlgStringEdit(label);
-    }
-	  dlgHBoxLayout {
-	  int mirror = 0;
-int rotate = 0;
-int flip   = 0;
-/*
-dlgGroup("Optional arguments") {
-  dlgCheckBox("&Mirror", mirror);
-  dlgCheckBox("&Rotate", rotate);
-  dlgCheckBox("&Flip", flip);
-  } 
-	*/  }
-  dlgSpacing(10);
-  dlgHBoxLayout {
-    dlgStretch(1);
-    dlgPushButton("+OK")    dlgAccept();
-    dlgPushButton("Cancel") dlgReject();
-    }
-  }; 
 }
+dlgVBoxLayout
+{
+    dlgGroup("Optional arguments")
+    {
 
+        dlgGridLayout
+        {
+            dlgCell(0, 0) dlgGroup("Start flag")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRadioButton("(", startTag);         // startTag = 0
+                    dlgRadioButton("/", startTag);         // startTag = 1
+                    dlgRadioButton("backslash", startTag); // startTag = 2
+                    dlgRadioButton(">", startTag);         // startTag = 3
+                    dlgRadioButton("[", startTag);         // startTag = 0
+                }
+            }
+            dlgCell(0, 1) dlgGroup("End flag")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRadioButton("(", endTag);         // endTag = 0
+                    dlgRadioButton("/", endTag);         // endTag = 1
+                    dlgRadioButton("backslash", endTag); // endTag = 2
+                    dlgRadioButton("<", endTag);         // endTag = 3
+                    dlgRadioButton("[", endTag);         // endTag = 4
+                }
+            }
+        }
+        dlgHBoxLayout
+        {
+
+            dlgLabel("Scale factor (height of text in inches. The default is 0.04\") :");
+            dlgRealEdit(scaleFactor);
+        }
+        dlgHBoxLayout
+        {
+            int selected = 2;
+            dlgLabel("Select layer for placing label (-l):");
+            dlgComboBox(layers, selected);
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Output mode (-o):");
+            dlgRadioButton("board script", outputMode);   //outputMode = 0
+            dlgRadioButton("library script", outputMode); //outputMode = 1
+            dlgRadioButton("library file", outputMode);   //outputMode = 2
+            dlgRadioButton("KiCAD fotprint", outputMode); //outputMode = 3
+        }
+        dlgGridLayout
+        {
+            dlgCell(0, 0) dlgGroup("Signal name (-n):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgStringEdit(signalName);
+                }
+            }
+            dlgCell(0, 1) dlgGroup("Trace width (-t):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRealEdit(traceWidth);
+                }
+            }
+            dlgCell(0, 2) dlgGroup("Output writing mode (-w):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRadioButton("(over)write", writeMode); //writeMode = 0
+                    dlgRadioButton("append", writeMode);      //writeMode = 1
+                }
+            }
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Footprint  anchor position (-a):");
+            dlgRadioButton("tl", anchorPosition); //anchorPosition = 0
+            dlgRadioButton("cl", anchorPosition); //anchorPosition = 1
+            dlgRadioButton("bl", anchorPosition); //anchorPosition = 2
+            dlgRadioButton("tc", anchorPosition); //anchorPosition = 3
+            dlgRadioButton("cc", anchorPosition); //anchorPosition = 4
+            dlgRadioButton("bc", anchorPosition); //anchorPosition = 5
+            dlgRadioButton("tr", anchorPosition); //anchorPosition = 6
+            dlgRadioButton("cr", anchorPosition); //anchorPosition = 7
+            dlgRadioButton("br", anchorPosition); //anchorPosition = 8
+        }
+    }
+}
+dlgSpacing(10);
+dlgHBoxLayout
+{
+    //dlgStretch(1);
+    dlgPushButton("+OK") dlgAccept();
+    dlgPushButton("Cancel") dlgReject();
+}
+}
+dlgTabPage("Settings")
+{
+    dlgHBoxLayout
+    {
+        dlgLabel(usage + "<hr>");
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel("File &name:");
+        dlgStringEdit(outputFileName);
+        dlgPushButton("Bro&wse")
+        {
+            outputFileName = dlgFileSave("Selec output file", outputFileName, "*.lbr");
+        }
+    }
+}
+}
+}
+;
+}
 //Change any / in a string to \
 //Useful for directory structure before calling a cmd
 string convertForwardToBackSlashes(string thing)
@@ -75,13 +196,13 @@ string getProjectPath()
 
 void createLabel()
 {
-inputWindow();
-dlgMessageBox(label);
+    inputWindow();
+    dlgMessageBox(label);
 
     //Convert forward slashes to back slashes so we can run system commands
     string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
 
-	string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
+    string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
     //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
 
     commandToRun += " & echo Generating labels";
@@ -92,14 +213,14 @@ dlgMessageBox(label);
         argList += argv[x] + " ";
 
     //sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
-	sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
+    sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
     commandToRun += " & " + s + label;
 
     dlgMessageBox(commandToRun);
     if (system(commandToRun) != 0)
     {
         //dlgMessageBox(s);
-		dlgMessageBox(s, "Error: Command failed.", "OK");
+        dlgMessageBox(s, "Error: Command failed.", "OK");
         exit(-1);
     }
 
@@ -110,6 +231,7 @@ dlgMessageBox(label);
 
 if (board)
 {
+    //inputWindow();
     createLabel();
 }
 else
