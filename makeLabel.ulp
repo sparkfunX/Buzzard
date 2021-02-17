@@ -15,7 +15,7 @@
 *******************************************************************************
 */
 
-    string ConfigFileName = "buzzard_ulp.cfg";
+string ConfigFileName = "buzzard_ulp.cfg";
 
 string commandToRun;
 string s;
@@ -28,14 +28,13 @@ string endTag[] = {" ", ")", "/", "\\", "<", "]"};
 real scaleFactor = 0.04;
 int selectedLayer = 2;
 string layers[] = {"1 -Top", "2 - Bottom", "21 - tPlace", "22 - bPlace", "25 - tNames", "26 - bNames"};
-int selectedAlign = 4;
-string align[] = {"Botttom left", "Bottom center", "Bottom right", "Center", "Center left", "Top left", "Top center", "Top right"};
+int selectedAlign = 3;
+string align[] = {"Botttom left", "Bottom center", "Bottom right", "Center left", "Center", "Center right", "Top left", "Top center", "Top right"};
 int selectedFont = 0;
 string font[] = {"FredokaOne", "Roboto"};
-int outputMode = 0;
+int outputMode = 2;
 string signalName = "GND";
 real traceWidth = 0;
-int anchorPosition = 1;
 int writeMode = 0;
 string outputFileName = "";
 string buzzardDir;
@@ -133,7 +132,7 @@ dlgVBoxLayout
         dlgHBoxLayout
         {
             dlgLabel("Font (-f):");
-                        dlgComboBox(font, selectedFont);
+            dlgComboBox(font, selectedFont);
         }
     }
 }
@@ -219,11 +218,132 @@ void createLabel()
     for (int x = 1; x < argc; x++)
         argList += argv[x] + " ";
 
-    sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
-    //sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
-    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd];// + scaleFactor;// + layers[selectedLayer] + align[selectedAlign];
+    if (outputMode == 2)
+    {
+        if (writeMode != 0)
+        {
+            sprintf(s, "python \"%sbuzzard.py\" -w a -o lib %s", localDirectory, argList);
+        }
+        else
+        {
+            sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
+        }
+    }
+    else
+    {
+        sprintf(s, "python \"%sbuzzard.py\" %s", localDirectory, argList);
+    }
 
-    dlgMessageBox(commandToRun);
+    if (scaleFactor != 0.04)
+    {
+        string temp;
+        sprintf(temp, " -s %f ", scaleFactor);
+        s += temp;
+    }
+
+    if (selectedLayer != 2)
+    {
+        string temp;
+        if (selectedLayer == 0)
+        {
+            sprintf(temp, " -l 1 ");
+        }
+        else if (selectedLayer == 1)
+        {
+            sprintf(temp, " -l 2 ");
+        }
+        else if (selectedLayer == 3)
+        {
+            sprintf(temp, " -l 22 ");
+        }
+        else if (selectedLayer == 4)
+        {
+            sprintf(temp, " -l 25 ");
+        }
+        else
+        {
+            sprintf(temp, " -l 26 ");
+        }
+        s += temp;
+    }
+    if (selectedAlign != 3)
+    {
+        string temp;
+        if (selectedAlign == 0)
+        {
+            sprintf(temp, " -a bl ");
+        }
+        else if (selectedAlign == 1)
+        {
+            sprintf(temp, " -a bc ");
+        }
+        else if (selectedAlign == 2)
+        {
+            sprintf(temp, " -a br ");
+        }
+        else if (selectedAlign == 4)
+        {
+            sprintf(temp, " -a cc ");
+        }
+        else if (selectedAlign == 5)
+        {
+            sprintf(temp, " -a cr ");
+        }
+        else if (selectedAlign == 6)
+        {
+            sprintf(temp, " -a tl ");
+        }
+        else if (selectedAlign == 7)
+        {
+            sprintf(temp, " -a tc ");
+        }
+        else
+        {
+            sprintf(temp, " -a tr ");
+        }
+        s += temp;
+    }
+    if (selectedFont != 0)
+    {
+        string temp;
+        sprintf(temp, " -f %s ", font[1]);
+        s += temp;
+    }
+    else
+    {
+        string temp;
+        sprintf(temp, " -f %s ", font[0]);
+        s += temp;
+    }
+
+    if (traceWidth != 0)
+    {
+        string temp;
+        sprintf(temp, " -t %f ", traceWidth);
+        s += temp;
+    }
+
+    if (outputMode != 2)
+    {
+        string temp;
+        if (outputMode == 0)
+        {
+            sprintf(temp, " -o b ");
+        }
+        else if (outputMode == 1)
+        {
+            sprintf(temp, " -o ls ");
+        }
+        else
+        {
+            sprintf(temp, " -o ki ");
+        }
+        s += temp;
+    }
+
+    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd]; // + scaleFactor;// + layers[selectedLayer] + align[selectedAlign];
+
+    //dlgMessageBox(commandToRun); //uncomment to see output command
     if (system(commandToRun) != 0)
     {
         //dlgMessageBox(s);
@@ -232,9 +352,15 @@ void createLabel()
     }
 
     //Python script should create a EAGLE friendly library file. Now run it.
-    sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
-    //sprintf(s, "", localDirectory);
-    exit(s);
+    if (outputMode == 2)
+    {
+        sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
+        exit(s);
+    }
+    else
+    {
+        exit(0);
+    }
 }
 
 if (board)

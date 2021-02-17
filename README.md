@@ -40,6 +40,10 @@ optional arguments:
 
   ```
   
+  ## Installation:
+  - Windows: open folder where you download and extracted Buzzard (Buzzard-master), hold **Shift** and **right-click** on that folder and from context menu select **"Open PowerShell Window Here"**. When the window is open, type: **"pip install -r requirements.txt"** and press Enter.
+  
+  
   ## labelText
   
   Label text should be enclosed in doublequotes in order to pass certain characters via the commandline. 
