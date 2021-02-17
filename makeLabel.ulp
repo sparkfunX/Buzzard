@@ -21,18 +21,24 @@ string commandToRun;
 string s;
 string label;
 
+int selectedStart = 0;
 string startTag[] = {" ", "(", "/", "\\", ">", "["};
-string endTag[] = {" ", "(", "/", "\\", ">", "["};
+int selectedEnd = 0;
+string endTag[] = {" ", ")", "/", "\\", "<", "]"};
 real scaleFactor = 0.04;
+int selectedLayer = 2;
 string layers[] = {"1 -Top", "2 - Bottom", "21 - tPlace", "22 - bPlace", "25 - tNames", "26 - bNames"};
+int selectedAlign = 4;
 string align[] = {"Botttom left", "Bottom center", "Bottom right", "Center", "Center left", "Top left", "Top center", "Top right"};
-string font[] = {"FredokaOne","Roboto"};
+int selectedFont = 0;
+string font[] = {"FredokaOne", "Roboto"};
 int outputMode = 0;
 string signalName = "GND";
 real traceWidth = 0;
 int anchorPosition = 1;
 int writeMode = 0;
 string outputFileName = "";
+string buzzardDir;
 
 //void
 
@@ -54,7 +60,6 @@ dlgHBoxLayout
         {
             dlgHBoxLayout
             {
-                int selectedStart = 0;
                 dlgComboBox(startTag, selectedStart);
             }
         }
@@ -66,7 +71,6 @@ dlgHBoxLayout
         {
             dlgHBoxLayout
             {
-                int selectedEnd = 0;
                 dlgComboBox(endTag, selectedEnd);
             }
         }
@@ -85,9 +89,8 @@ dlgVBoxLayout
         }
         dlgHBoxLayout
         {
-            int selected = 2;
             dlgLabel("Select layer for placing label (-l):");
-            dlgComboBox(layers, selected);
+            dlgComboBox(layers, selectedLayer);
         }
         dlgHBoxLayout
         {
@@ -125,14 +128,12 @@ dlgVBoxLayout
         dlgHBoxLayout
         {
             dlgLabel("Footprint  anchor position (-a):");
-            int selectAlign = 4;
-            dlgComboBox(align, selectAlign);
+            dlgComboBox(align, selectedAlign);
         }
         dlgHBoxLayout
         {
             dlgLabel("Font (-f):");
-            int selectFont = 0;
-            dlgComboBox(font, selectFont);
+                        dlgComboBox(font, selectedFont);
         }
     }
 }
@@ -152,11 +153,21 @@ dlgTabPage("Settings")
     }
     dlgHBoxLayout
     {
-        dlgLabel("File &name:");
+
+        dlgLabel("Output file (-d):");
         dlgStringEdit(outputFileName);
         dlgPushButton("Bro&wse")
         {
-            outputFileName = dlgFileSave("Selec output file", outputFileName, "*.lbr");
+            outputFileName = dlgFileSave("Select output file..", outputFileName, "*.lbr");
+        }
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel("Buzzard.py script directory:");
+        dlgStringEdit(buzzardDir);
+        dlgPushButton("Bro&wse")
+        {
+            buzzardDir = dlgDirectory("Select folder..", "");
         }
     }
 }
@@ -194,7 +205,6 @@ string getProjectPath()
 void createLabel()
 {
     inputWindow();
-    dlgMessageBox(label);
 
     //Convert forward slashes to back slashes so we can run system commands
     string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
@@ -209,9 +219,9 @@ void createLabel()
     for (int x = 1; x < argc; x++)
         argList += argv[x] + " ";
 
-    //sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
-    sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
-    commandToRun += " & " + s + label;
+    sprintf(s, "python \"%sbuzzard.py\" -o lib %s", localDirectory, argList);
+    //sprintf(s, "python \"%sbuzzard.py\" -w a -v -o lib %s", localDirectory, argList);
+    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd];// + scaleFactor;// + layers[selectedLayer] + align[selectedAlign];
 
     dlgMessageBox(commandToRun);
     if (system(commandToRun) != 0)
@@ -223,13 +233,14 @@ void createLabel()
 
     //Python script should create a EAGLE friendly library file. Now run it.
     sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
+    //sprintf(s, "", localDirectory);
     exit(s);
 }
 
 if (board)
 {
-    inputWindow();
-    //createLabel();
+    //inputWindow();
+    createLabel();
 }
 else
 {
