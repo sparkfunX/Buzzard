@@ -7,15 +7,15 @@
 
     run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg -s 300
 
-
 */
+
     /*
 *******************************************************************************
 *                           GLOBAL VARIABLES
 *******************************************************************************
 */
 
-string ConfigFileName = "buzzard_ulp.cfg";
+    string ConfigFileName = "buzzard_ulp.cfg";
 
 string commandToRun;
 string s;
@@ -39,7 +39,103 @@ int writeMode = 0;
 string outputFileName = "";
 string buzzardDir;
 
-//void
+int saveStartTag = 0;
+int saveEndTag = 0;
+int saveScaleFactor = 0;
+int saveLayers = 0;
+int saveAlign = 0;
+int saveFont = 0;
+int saveOutput = 0;
+int saveSignalName = 0;
+int saveTraceWidth = 0;
+int saveWriteMode = 0;
+
+/*
+********************************************************************************
+*                                 GUI FUNCTIONS
+********************************************************************************
+*/
+
+/*
+*******************************************************************************
+*                              LoadConfigSettings()
+*
+* Description:  Loads the most recent configuration settings.
+*
+* Arguments:    none
+*
+* Return:       none
+*
+* Caller:       Main GUI code
+*
+*******************************************************************************
+*/
+
+void LoadConfigSettings()
+{
+    string a[];
+    string rf[];
+    int selectedStartTemp, selectedEndTemp, selectedLayerTemp, selectedAlignTemp, selectedFontTemp, outputModeTemp, writeModeTemp;
+    real scaleFactorTemp, traceWidthTemp;
+    string signalNameTemp;
+        int nrf = fileglob(rf, filedir(argv[0]) + ConfigFileName);
+
+    if (nrf)
+    {
+        nrf = fileread(a, rf[0]);
+    }
+
+    if (nrf == 12)
+    {
+        int i = 0;
+        selectedStartTemp = strtol(a[i++]);
+        selectedEndTemp = strtol(a[i++]);
+        scaleFactorTemp = strtod(a[i++]);
+        selectedLayerTemp = strtol(a[i++]);
+        selectedAlignTemp = strtol(a[i++]);
+        selectedFontTemp = strtol(a[i++]);
+        outputModeTemp = strtol(a[i++]);
+        signalNameTemp = a[i++];
+        traceWidthTemp = strtod(a[i++]);
+        writeModeTemp = strtol(a[i++]);
+        outputFileName = a[i++];
+        buzzardDir = a[i++];
+    }
+}
+
+/*
+*******************************************************************************
+*                              SaveConfigSettings()
+*
+* Description:  Saves the most recent configuration settings.
+*
+* Arguments:    none
+*
+* Return:       none
+*
+* Caller:       runscript
+*
+*******************************************************************************
+*/
+
+void SaveConfigSettings()
+{
+    output(filedir(argv[0]) + ConfigFileName, "wt")
+    {
+        printf("%d\n", selectedStart);
+        printf("%d\n", selectedEnd);
+        printf("%f\n", scaleFactor);
+        printf("%d\n", selectedLayer);
+        printf("%d\n", selectedAlign);
+        printf("%d\n", selectedFont);
+        printf("%d\n", outputMode);
+        printf("%s\n", signalName);
+        printf("%f\n", traceWidth);
+        printf("%d\n", writeMode);
+        printf("%s\n", outputFileName);
+        printf("%s\n", buzzardDir);
+    }
+}
 
 void inputWindow()
 {
@@ -140,8 +236,8 @@ dlgSpacing(10);
 dlgHBoxLayout
 {
     //dlgStretch(1);
-    dlgPushButton("+OK") dlgAccept();
-    dlgPushButton("Cancel") dlgReject();
+    dlgPushButton("OK") dlgAccept();
+    dlgPushButton("-Cancel") dlgReject();
 }
 }
 dlgTabPage("Settings")
@@ -203,6 +299,8 @@ string getProjectPath()
 
 void createLabel()
 {
+    // load the last filename config settings
+    LoadConfigSettings();
     inputWindow();
 
     //Convert forward slashes to back slashes so we can run system commands
@@ -344,6 +442,7 @@ void createLabel()
     commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd]; // + scaleFactor;// + layers[selectedLayer] + align[selectedAlign];
 
     //dlgMessageBox(commandToRun); //uncomment to see output command
+    SaveConfigSettings();
     if (system(commandToRun) != 0)
     {
         //dlgMessageBox(s);
