@@ -322,7 +322,6 @@ dlgVBoxLayout
 dlgSpacing(10);
 dlgHBoxLayout
 {
-    //dlgStretch(1);
     dlgPushButton("OK") dlgAccept();
     dlgPushButton("-Cancel") dlgReject();
 }
@@ -341,15 +340,12 @@ dlgTabPage("Settings")
     }
     dlgHBoxLayout
     {
-        // dlgLabel("Test");
-        // {
         dlgLabel("Buzzard.py script directory:");
         dlgStringEdit(buzzardDir);
         dlgPushButton("Bro&wse")
         {
             buzzardDir = dlgDirectory("Select folder..", "");
         }
-        //}
     }
 
     dlgHBoxLayout
@@ -414,9 +410,10 @@ void createLabel()
     inputWindow();
 
     //Convert forward slashes to back slashes so we can run system commands
-    string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
-    //string localDirectory = convertForwardToBackSlashes(buzzardDir);
+    //string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
+    string localDirectory = convertForwardToBackSlashes(buzzardDir);
     string outputFile = convertForwardToBackSlashes(outputFileName);
+    localDirectory += "\\"; // need to add one more backslash to complete directory address 
 
     string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
     //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
@@ -551,7 +548,7 @@ void createLabel()
         s += temp;
     }
 
-    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd]; // + scaleFactor;// + layers[selectedLayer] + align[selectedAlign];
+    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd]; 
 
     //dlgMessageBox(commandToRun); //uncomment to see output command
     SaveConfigSettings();
@@ -576,7 +573,6 @@ void createLabel()
 
 if (board)
 {
-    //inputWindow();
     createLabel();
 }
 else
