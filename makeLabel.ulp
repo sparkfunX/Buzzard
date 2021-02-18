@@ -78,14 +78,14 @@ void LoadConfigSettings()
     int selectedStartTemp, selectedEndTemp, selectedLayerTemp, selectedAlignTemp, selectedFontTemp, outputModeTemp, writeModeTemp;
     real scaleFactorTemp, traceWidthTemp;
     string signalNameTemp;
-        int nrf = fileglob(rf, filedir(argv[0]) + ConfigFileName);
+    int nrf = fileglob(rf, filedir(argv[0]) + ConfigFileName);
 
     if (nrf)
     {
         nrf = fileread(a, rf[0]);
     }
 
-    if (nrf == 12)
+    if (nrf == 22)
     {
         int i = 0;
         selectedStartTemp = strtol(a[i++]);
@@ -100,6 +100,60 @@ void LoadConfigSettings()
         writeModeTemp = strtol(a[i++]);
         outputFileName = a[i++];
         buzzardDir = a[i++];
+        saveStartTag = strtol(a[i++]);
+        saveEndTag = strtol(a[i++]);
+        saveScaleFactor = strtol(a[i++]);
+        saveLayers = strtol(a[i++]);
+        saveAlign = strtol(a[i++]);
+        saveFont = strtol(a[i++]);
+        saveOutput = strtol(a[i++]);
+        saveSignalName = strtol(a[i++]);
+        saveTraceWidth = strtol(a[i++]);
+        saveWriteMode = strtol(a[i++]);
+    }
+    else
+    {
+        dlgMessageBox("Error loading settings");
+    }
+    if (saveStartTag != 0)
+    {
+        selectedStart = selectedStartTemp;
+    }
+    if (saveEndTag != 0)
+    {
+        selectedEnd = selectedEndTemp;
+    }
+    if (saveScaleFactor != 0)
+    {
+        scaleFactor = scaleFactorTemp;
+    }
+    if (saveLayers != 0)
+    {
+        selectedLayer = selectedLayerTemp;
+    }
+    if (saveAlign != 0)
+    {
+        selectedAlign = selectedAlignTemp;
+    }
+    if (saveFont != 0)
+    {
+        selectedFont = selectedFontTemp;
+    }
+    if (saveOutput != 0)
+    {
+        outputMode = outputModeTemp;
+    }
+    if (saveSignalName != 0)
+    {
+        signalName = signalNameTemp;
+    }
+    if (saveTraceWidth != 0)
+    {
+        traceWidth = traceWidthTemp;
+    }
+    if (saveWriteMode != 0)
+    {
+        writeMode = writeModeTemp;
     }
 }
 
@@ -134,7 +188,40 @@ void SaveConfigSettings()
         printf("%d\n", writeMode);
         printf("%s\n", outputFileName);
         printf("%s\n", buzzardDir);
+        printf("%d\n", saveStartTag);
+        printf("%d\n", saveEndTag);
+        printf("%d\n", saveScaleFactor);
+        printf("%d\n", saveLayers);
+        printf("%d\n", saveAlign);
+        printf("%d\n", saveFont);
+        printf("%d\n", saveOutput);
+        printf("%d\n", saveSignalName);
+        printf("%d\n", saveTraceWidth);
+        printf("%d\n", saveWriteMode);
     }
+}
+
+//Change any / in a string to \
+//Useful for directory structure before calling a cmd
+string convertForwardToBackSlashes(string thing)
+{
+    //Convert forward slashes to back slashes so we can run system command
+    int pos = strrchr(thing, '/');
+    while (pos >= 0)
+    {
+        //thing = strsub(thing, 0, pos) + "\\\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
+        thing = strsub(thing, 0, pos) + "\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
+        pos = strrchr(thing, '/');                                                    //Look for the next forward slash
+    }
+    return (thing);
+}
+
+string getProjectPath()
+{
+    if (board)
+        board(B) return (filedir(B.name));
+    if (schematic)
+        schematic(B) return (filedir(B.name));
 }
 
 void inputWindow()
@@ -244,10 +331,6 @@ dlgTabPage("Settings")
 {
     dlgHBoxLayout
     {
-        dlgLabel(usage + "<hr>");
-    }
-    dlgHBoxLayout
-    {
 
         dlgLabel("Output file (-d):");
         dlgStringEdit(outputFileName);
@@ -258,39 +341,66 @@ dlgTabPage("Settings")
     }
     dlgHBoxLayout
     {
+        // dlgLabel("Test");
+        // {
         dlgLabel("Buzzard.py script directory:");
         dlgStringEdit(buzzardDir);
         dlgPushButton("Bro&wse")
         {
             buzzardDir = dlgDirectory("Select folder..", "");
         }
+        //}
+    }
+
+    dlgHBoxLayout
+    {
+        dlgLabel("<hr>");
+    }
+    dlgHBoxLayout
+    {
+        dlgGroup("Save settings (check those which you want to keep between sessions)")
+        {
+            dlgGridLayout
+            {
+
+                dlgCell(0, 0) dlgGridLayout
+                {
+                    dlgCell(0, 0)
+                    {
+
+                        dlgCheckBox("Start tag", saveStartTag);
+                        dlgCheckBox("End tag", saveEndTag);
+                        dlgCheckBox("Scale factor", saveScaleFactor);
+                    }
+                    dlgCell(1, 0)
+                    {
+                        dlgCheckBox("Selected layer", saveLayers);
+                        dlgCheckBox("Align", saveAlign);
+                        dlgCheckBox("Font", saveFont);
+                    }
+                    dlgCell(2, 0)
+                    {
+                        dlgCheckBox("Output mode", saveOutput);
+                        dlgCheckBox("Trace width", saveTraceWidth);
+                        dlgCheckBox("Write mode", saveWriteMode);
+                    }
+                }
+            }
+        }
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel("<hr>");
+    }
+    dlgHBoxLayout
+    {
+
+        dlgLabel(usage);
     }
 }
 }
 }
 ;
-}
-//Change any / in a string to \
-//Useful for directory structure before calling a cmd
-string convertForwardToBackSlashes(string thing)
-{
-    //Convert forward slashes to back slashes so we can run system command
-    int pos = strrchr(thing, '/');
-    while (pos >= 0)
-    {
-        //thing = strsub(thing, 0, pos) + "\\\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
-        thing = strsub(thing, 0, pos) + "\\" + strsub(thing, pos + 1, strlen(thing)); //Remove and replace
-        pos = strrchr(thing, '/');                                                    //Look for the next forward slash
-    }
-    return (thing);
-}
-
-string getProjectPath()
-{
-    if (board)
-        board(B) return (filedir(B.name));
-    if (schematic)
-        schematic(B) return (filedir(B.name));
 }
 
 //add *@C:\Users\natha\Dropbox\Projects\Buzzard\output.lbr
@@ -305,6 +415,8 @@ void createLabel()
 
     //Convert forward slashes to back slashes so we can run system commands
     string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
+    //string localDirectory = convertForwardToBackSlashes(buzzardDir);
+    string outputFile = convertForwardToBackSlashes(outputFileName);
 
     string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
     //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
@@ -447,13 +559,13 @@ void createLabel()
     {
         //dlgMessageBox(s);
         dlgMessageBox(s, "Error: Command failed.", "OK");
-        exit(-1);
+        exit(0);
     }
 
     //Python script should create a EAGLE friendly library file. Now run it.
     if (outputMode == 2)
     {
-        sprintf(s, "ADD '*@%s/output.lbr'", localDirectory);
+        sprintf(s, "ADD '*@%s'", outputFile);
         exit(s);
     }
     else
