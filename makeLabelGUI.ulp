@@ -1,13 +1,8 @@
 #usage "en: <b>Create a polygon based label using SparkFun's Buzzard system."
-"<p>Usage: run makeLabel</p>"
-    "<p>Author: <author>Nathan Seidle</author><br />"
+"<p>Usage: set all parameters, file and folder paths and click OK</p>"
+    "<p>Author: <author>Miroslav Zuzelka</author><br />"
+    "<p>based on makeLabel.ulp script from Nathan Seidle<br />"
     "Version: <em>1.0</em></p>"
-
-    /*
-
-    run C:\Dropbox\Projects\Buzzard\makelabel.ulp C:/Dropbox/Projects/Buzzard/text.svg -s 300
-
-*/
 
     /*
 *******************************************************************************
@@ -38,17 +33,8 @@ real traceWidth = 0;
 int writeMode = 0;
 string outputFileName = "";
 string buzzardDir;
-
-int saveStartTag = 0;
-int saveEndTag = 0;
-int saveScaleFactor = 0;
-int saveLayers = 0;
-int saveAlign = 0;
-int saveFont = 0;
-int saveOutput = 0;
-int saveSignalName = 0;
-int saveTraceWidth = 0;
-int saveWriteMode = 0;
+string managedLibraryAddress;
+int saveStartTag, saveEndTag, saveScaleFactor, saveLayers, saveAlign, saveFont, saveOutput, saveSignalName, saveTraceWidth, saveWriteMode, saveToManagedLibrary = 0;
 
 /*
 ********************************************************************************
@@ -58,7 +44,7 @@ int saveWriteMode = 0;
 
 /*
 *******************************************************************************
-*                              LoadConfigSettings()
+* LoadConfigSettings() - based on the function from import-dxf-1_6.ulp by Jorge Garcia
 *
 * Description:  Loads the most recent configuration settings.
 *
@@ -85,7 +71,7 @@ void LoadConfigSettings()
         nrf = fileread(a, rf[0]);
     }
 
-    if (nrf == 22)
+    if (nrf == 24)
     {
         int i = 0;
         selectedStartTemp = strtol(a[i++]);
@@ -100,6 +86,7 @@ void LoadConfigSettings()
         writeModeTemp = strtol(a[i++]);
         outputFileName = a[i++];
         buzzardDir = a[i++];
+        managedLibraryAddress = a[i++];
         saveStartTag = strtol(a[i++]);
         saveEndTag = strtol(a[i++]);
         saveScaleFactor = strtol(a[i++]);
@@ -110,6 +97,7 @@ void LoadConfigSettings()
         saveSignalName = strtol(a[i++]);
         saveTraceWidth = strtol(a[i++]);
         saveWriteMode = strtol(a[i++]);
+        saveToManagedLibrary = strtol(a[i++]);
     }
     else
     {
@@ -159,7 +147,7 @@ void LoadConfigSettings()
 
 /*
 *******************************************************************************
-*                              SaveConfigSettings()
+* SaveConfigSettings() - based on the function from import-dxf-1_6.ulp by Jorge Garcia
 *
 * Description:  Saves the most recent configuration settings.
 *
@@ -167,7 +155,7 @@ void LoadConfigSettings()
 *
 * Return:       none
 *
-* Caller:       runscript
+* Caller:       main script code
 *
 *******************************************************************************
 */
@@ -188,6 +176,7 @@ void SaveConfigSettings()
         printf("%d\n", writeMode);
         printf("%s\n", outputFileName);
         printf("%s\n", buzzardDir);
+        printf("%s\n", managedLibraryAddress);
         printf("%d\n", saveStartTag);
         printf("%d\n", saveEndTag);
         printf("%d\n", saveScaleFactor);
@@ -198,11 +187,25 @@ void SaveConfigSettings()
         printf("%d\n", saveSignalName);
         printf("%d\n", saveTraceWidth);
         printf("%d\n", saveWriteMode);
+        printf("%d\n", saveToManagedLibrary);
     }
 }
 
-//Change any / in a string to \
-//Useful for directory structure before calling a cmd
+/*
+*******************************************************************************
+* convertForwardToBackSlashes() - original function by Nathan Seidle
+*
+* Description:  Change any / in a string to \. Useful for directory structure before calling a cmd
+*
+* Arguments:    none
+*
+* Return:       Return changed string.  
+*
+* Caller:       main script code
+*
+*******************************************************************************
+*/
+
 string convertForwardToBackSlashes(string thing)
 {
     //Convert forward slashes to back slashes so we can run system command
@@ -224,199 +227,29 @@ string getProjectPath()
         schematic(B) return (filedir(B.name));
 }
 
-void inputWindow()
-{
-    int Result = dlgDialog("Buzzard label generator"){
-        dlgTabWidget{
-            dlgTabPage("Main"){
-                dlgHBoxLayout{
-                    dlgStretch(1);
-    dlgLabel("Enter label which you want to make:");
-    dlgStretch(1);
-}
-dlgHBoxLayout
-{
-    dlgGridLayout
-    {
-        dlgCell(0, 0) dlgGroup("Start flag")
-        {
-            dlgHBoxLayout
-            {
-                dlgComboBox(startTag, selectedStart);
-            }
-        }
-        dlgCell(0, 1) dlgGroup("Label:")
-        {
-            dlgStringEdit(label);
-        }
-        dlgCell(0, 2) dlgGroup("End flag")
-        {
-            dlgHBoxLayout
-            {
-                dlgComboBox(endTag, selectedEnd);
-            }
-        }
-    }
-}
-dlgVBoxLayout
-{
-    dlgGroup("Optional arguments")
-    {
-
-        dlgHBoxLayout
-        {
-
-            dlgLabel("Scale factor (height of text in inches. The default is 0.04\") :");
-            dlgRealEdit(scaleFactor);
-        }
-        dlgHBoxLayout
-        {
-            dlgLabel("Select layer for placing label (-l):");
-            dlgComboBox(layers, selectedLayer);
-        }
-        dlgHBoxLayout
-        {
-            dlgLabel("Output mode (-o):");
-            dlgRadioButton("board script", outputMode);   //outputMode = 0
-            dlgRadioButton("library script", outputMode); //outputMode = 1
-            dlgRadioButton("library file", outputMode);   //outputMode = 2
-            dlgRadioButton("KiCAD fotprint", outputMode); //outputMode = 3
-        }
-        dlgGridLayout
-        {
-            dlgCell(0, 0) dlgGroup("Signal name (-n):")
-            {
-                dlgHBoxLayout
-                {
-                    dlgStringEdit(signalName);
-                }
-            }
-            dlgCell(0, 1) dlgGroup("Trace width (-t):")
-            {
-                dlgHBoxLayout
-                {
-                    dlgRealEdit(traceWidth);
-                }
-            }
-            dlgCell(0, 2) dlgGroup("Output writing mode (-w):")
-            {
-                dlgHBoxLayout
-                {
-                    dlgRadioButton("(over)write", writeMode); //writeMode = 0
-                    dlgRadioButton("append", writeMode);      //writeMode = 1
-                }
-            }
-        }
-        dlgHBoxLayout
-        {
-            dlgLabel("Footprint  anchor position (-a):");
-            dlgComboBox(align, selectedAlign);
-        }
-        dlgHBoxLayout
-        {
-            dlgLabel("Font (-f):");
-            dlgComboBox(font, selectedFont);
-        }
-    }
-}
-dlgSpacing(10);
-dlgHBoxLayout
-{
-    dlgPushButton("OK") dlgAccept();
-    dlgPushButton("-Cancel") dlgReject();
-}
-}
-dlgTabPage("Settings")
-{
-    dlgHBoxLayout
-    {
-
-        dlgLabel("Output file (-d):");
-        dlgStringEdit(outputFileName);
-        dlgPushButton("Bro&wse")
-        {
-            outputFileName = dlgFileSave("Select output file..", outputFileName, "*.lbr");
-        }
-    }
-    dlgHBoxLayout
-    {
-        dlgLabel("Buzzard.py script directory:");
-        dlgStringEdit(buzzardDir);
-        dlgPushButton("Bro&wse")
-        {
-            buzzardDir = dlgDirectory("Select folder..", "");
-        }
-    }
-
-    dlgHBoxLayout
-    {
-        dlgLabel("<hr>");
-    }
-    dlgHBoxLayout
-    {
-        dlgGroup("Save settings (check those which you want to keep between sessions)")
-        {
-            dlgGridLayout
-            {
-
-                dlgCell(0, 0) dlgGridLayout
-                {
-                    dlgCell(0, 0)
-                    {
-
-                        dlgCheckBox("Start tag", saveStartTag);
-                        dlgCheckBox("End tag", saveEndTag);
-                        dlgCheckBox("Scale factor", saveScaleFactor);
-                    }
-                    dlgCell(1, 0)
-                    {
-                        dlgCheckBox("Selected layer", saveLayers);
-                        dlgCheckBox("Align", saveAlign);
-                        dlgCheckBox("Font", saveFont);
-                    }
-                    dlgCell(2, 0)
-                    {
-                        dlgCheckBox("Output mode", saveOutput);
-                        dlgCheckBox("Trace width", saveTraceWidth);
-                        dlgCheckBox("Write mode", saveWriteMode);
-                    }
-                }
-            }
-        }
-    }
-    dlgHBoxLayout
-    {
-        dlgLabel("<hr>");
-    }
-    dlgHBoxLayout
-    {
-
-        dlgLabel(usage);
-    }
-}
-}
-}
-;
-}
-
-//add *@C:\Users\natha\Dropbox\Projects\Buzzard\output.lbr
-//If there is one item in lib, it will mouse populate
-//If there is more than one, a tree will be presented to use
+/*
+*******************************************************************************
+* createLabel() - modified function by Nathan Seidle
+*
+* Description:  Main script of the ULP. 
+*
+* Arguments:    none
+*
+* Return:       none  
+*
+* Caller:       Main GUI code.
+*
+*******************************************************************************
+*/
 
 void createLabel()
 {
-    // load the last filename config settings
-    LoadConfigSettings();
-    inputWindow();
-
     //Convert forward slashes to back slashes so we can run system commands
-    //string localDirectory = convertForwardToBackSlashes(filedir(argv[0]));
     string localDirectory = convertForwardToBackSlashes(buzzardDir);
     string outputFile = convertForwardToBackSlashes(outputFileName);
-    localDirectory += "\\"; // need to add one more backslash to complete directory address 
+    localDirectory += "\\"; // need to add one more backslash to complete directory address
 
     string commandToRun = "cmd.exe /C echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
-    //string commandToRun = "cmd.exe /K echo Relax. This can take a minute..."; //This is the start of the command. /C = close window
 
     commandToRun += " & echo Generating labels";
 
@@ -548,7 +381,7 @@ void createLabel()
         s += temp;
     }
 
-    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd]; 
+    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd];
 
     //dlgMessageBox(commandToRun); //uncomment to see output command
     SaveConfigSettings();
@@ -562,18 +395,237 @@ void createLabel()
     //Python script should create a EAGLE friendly library file. Now run it.
     if (outputMode == 2)
     {
-        sprintf(s, "ADD '*@%s'", outputFile);
-        exit(s);
-    }
-    else
-    {
-        exit(0);
+        if (saveToManagedLibrary != 0) //save output to managed library 
+        {
+            dlgMessageBox(managedLibraryAddress);
+            sprintf(s, "ADD '*@%s'", managedLibraryAddress);
+            exit(s);
+        }
+        else //save output to the file
+        {
+            sprintf(s, "ADD '*@%s'", outputFile);
+            exit(s);
+        }
     }
 }
 
+/*
+*******************************************************************************
+* inputWindow() - modified function by Nathan Seidle
+*
+* Description:  Main GUI function. 
+*
+* Arguments:    none
+*
+* Return:       none  
+*
+* Caller:       none
+*
+*******************************************************************************
+*/
+
+void inputWindow()
+{
+    LoadConfigSettings();
+    int Result = dlgDialog("Buzzard label generator"){
+        dlgTabWidget{
+            dlgTabPage("Main"){
+                dlgHBoxLayout{
+                    dlgStretch(1);
+    dlgLabel("Enter label which you want to make:");
+    dlgStretch(1);
+}
+dlgHBoxLayout
+{
+    dlgGridLayout
+    {
+        dlgCell(0, 0) dlgGroup("Start flag")
+        {
+            dlgHBoxLayout
+            {
+                dlgComboBox(startTag, selectedStart);
+            }
+        }
+        dlgCell(0, 1) dlgGroup("Label:")
+        {
+            dlgStringEdit(label);
+        }
+        dlgCell(0, 2) dlgGroup("End flag")
+        {
+            dlgHBoxLayout
+            {
+                dlgComboBox(endTag, selectedEnd);
+            }
+        }
+    }
+}
+dlgVBoxLayout
+{
+    dlgGroup("Optional arguments")
+    {
+
+        dlgHBoxLayout
+        {
+
+            dlgLabel("Scale factor (height of text in inches. The default is 0.04\") :");
+            dlgRealEdit(scaleFactor);
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Select layer for placing label (-l):");
+            dlgComboBox(layers, selectedLayer);
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Output mode (-o):");
+            dlgRadioButton("board script", outputMode);   //outputMode = 0
+            dlgRadioButton("library script", outputMode); //outputMode = 1
+            dlgRadioButton("library file", outputMode);   //outputMode = 2
+            dlgRadioButton("KiCAD fotprint", outputMode); //outputMode = 3
+        }
+        dlgGridLayout
+        {
+            dlgCell(0, 0) dlgGroup("Signal name (-n):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgStringEdit(signalName);
+                }
+            }
+            dlgCell(0, 1) dlgGroup("Trace width (-t):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRealEdit(traceWidth);
+                }
+            }
+            dlgCell(0, 2) dlgGroup("Output writing mode (-w):")
+            {
+                dlgHBoxLayout
+                {
+                    dlgRadioButton("(over)write", writeMode); //writeMode = 0
+                    dlgRadioButton("append", writeMode);      //writeMode = 1
+                }
+            }
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Footprint  anchor position (-a):");
+            dlgComboBox(align, selectedAlign);
+        }
+        dlgHBoxLayout
+        {
+            dlgLabel("Font (-f):");
+            dlgComboBox(font, selectedFont);
+        }
+    }
+}
+dlgSpacing(10);
+dlgHBoxLayout
+{
+    dlgPushButton("+OK")
+    {
+        createLabel();
+    }
+    dlgPushButton("-Cancel") dlgReject();
+}
+}
+dlgTabPage("Settings")
+{
+    dlgHBoxLayout
+    {
+
+        dlgLabel("Output file (-d):");
+        dlgStringEdit(outputFileName);
+        dlgPushButton("Bro&wse")
+        {
+            outputFileName = dlgFileSave("Select output file..", outputFileName, "*.lbr");
+        }
+    }
+    dlgHBoxLayout
+    {
+
+        dlgLabel("Managed library address:");
+        dlgStringEdit(managedLibraryAddress);
+        dlgCheckBox("Save to managed library", saveToManagedLibrary);
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel("Buzzard.py script directory:");
+        dlgStringEdit(buzzardDir);
+        dlgPushButton("Bro&wse")
+        {
+            buzzardDir = dlgDirectory("Select folder..", "");
+        }
+    }
+
+    dlgHBoxLayout
+    {
+        dlgLabel("<hr>");
+    }
+    dlgHBoxLayout
+    {
+        dlgGroup("Save settings (check those which you want to keep between sessions)")
+        {
+            dlgGridLayout
+            {
+
+                dlgCell(0, 0) dlgGridLayout
+                {
+                    dlgCell(0, 0)
+                    {
+
+                        dlgCheckBox("Start tag", saveStartTag);
+                        dlgCheckBox("End tag", saveEndTag);
+                        dlgCheckBox("Scale factor", saveScaleFactor);
+                    }
+                    dlgCell(1, 0)
+                    {
+                        dlgCheckBox("Selected layer", saveLayers);
+                        dlgCheckBox("Align", saveAlign);
+                        dlgCheckBox("Font", saveFont);
+                    }
+                    dlgCell(2, 0)
+                    {
+                        dlgCheckBox("Output mode", saveOutput);
+                        dlgCheckBox("Trace width", saveTraceWidth);
+                        dlgCheckBox("Write mode", saveWriteMode);
+                    }
+                }
+            }
+        }
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel("<hr>");
+    }
+    dlgHBoxLayout
+    {
+        dlgLabel(usage);
+    }
+}
+}
+}
+;
+}
+
+/*
+*******************************************************************************
+*
+* Description:  Main routine of the ULP. 
+*
+* Arguments:    none
+*
+* Return:       none  
+*
+* Caller:       none
+*
+*******************************************************************************
+*/
+
 if (board)
 {
-    createLabel();
+    inputWindow();
 }
 else
 {
