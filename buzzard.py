@@ -12,6 +12,7 @@ import sys
 import re
 import xml.etree.ElementTree as XMLET
 import shlex
+import time
 
 svgstring2path = __import__('modules.svgstring2path', globals(), locals(), ['string2paths'])
 string2paths = svgstring2path.string2paths
@@ -585,7 +586,12 @@ def drawSVG(svg_attributes, attributes, paths):
         out += "(footprint \"buzzardLabel\"\n" + \
             " (layer \"F.Cu\")\n" + \
             " (attr board_only exclude_from_pos_files exclude_from_bom)\n"
-
+    if args.outMode == "ki5":
+        out += "(module \"buzzardLabel\"" + \
+            " (layer \"F.Cu\")" + \
+            " (tedit \"" + hex(int(time.time()))[2:-1].upper() + "\")\n" + \
+            " (attr virtual)\n"
+    
     if len(paths) == 0:
         print("No paths found. Did you use 'Object to path' in Inkscape?")
     anyVisiblePaths = False
@@ -701,7 +707,7 @@ def drawSVG(svg_attributes, attributes, paths):
                 if args.outMode == "ls":
                     scriptLine += "polygon " + TRACEWIDTH + "mm "
 
-                if args.outMode != "ki":
+                if args.outMode.find("ki") == -1:
                     for p in points:
                         precisionX = '{0:.2f}'.format(round(p.real, 6))
                         precisionY = '{0:.2f}'.format(round(exportHeight - p.imag, 6))
@@ -709,13 +715,17 @@ def drawSVG(svg_attributes, attributes, paths):
 
                     scriptLine += ';'
 
-                elif args.outMode == "ki":
+                elif args.outMode.find("ki") != -1:
                     scriptLine += " (fp_poly (pts"
                     for p in points:
                         precisionX = "{0:.2f}".format(round(p.real, 6))
                         precisionY = "{0:.2f}".format(round(p.imag - exportHeight, 6))
                         scriptLine += " (xy " + precisionX + " " + precisionY + ")"
-                    scriptLine += ") (layer \"F.SilkS\") (width 0.01) (fill solid))\n"
+
+                    if args.outMode == "ki":
+                        scriptLine += ") (layer \"F.SilkS\") (width 0.01) (fill solid))\n"
+                    elif args.outMode == "ki5":
+                        scriptLine += ") (layer \"F.SilkS\") (width 0.01))\n"
             else:
 
                 scriptLine += "<polygon width=\"" + TRACEWIDTH + "\" layer=\"" + str(args.eagleLayerNumber) + "\">\n"
@@ -734,7 +744,7 @@ def drawSVG(svg_attributes, attributes, paths):
     if not anyVisiblePaths:
         print("No paths with fills or strokes found.")
 
-    if args.outMode == "ki":
+    if args.outMode.find("ki") != -1:
         out += ')\n'
 
     return out
@@ -755,7 +765,7 @@ def generate(labelString):
 
     elif args.outMode != 'lib':
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
-        ext = '.scr' if args.outMode != "ki" else ".kicad_mod"
+        ext = '.scr' if args.outMode.find("ki") == -1 else ".kicad_mod"
 
         try:
             f = open(path_to_script + "/" + args.destination + ext, 'w')
@@ -1106,8 +1116,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', dest='verbose', default=False,
                         help='Verbose mode (helpful for debugging)', action='store_true')
 
-    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib', 'ki'],
-                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file, \'ki\'=KiCad footprint)')
+    parser.add_argument('-o', dest='outMode', default='b', choices=['b', 'ls', 'lib', 'ki', 'ki5'],
+                        help='Output Mode (\'b\'=board script, \'ls\'=library script, \'lib\'=library file, \'ki\'=KiCad v6 footprint, \'ki5\'=KiCad v5 footprint)')
 
     parser.add_argument('-n', dest='signalName', default='GND',
                         help='Signal name for polygon. Required if layer is not 21 (default is \'GND\')')
