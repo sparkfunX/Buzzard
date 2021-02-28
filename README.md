@@ -6,6 +6,26 @@ If you're looking for legacy buzzard, it is still live at [github.io](https://sp
   
   Thanks to [Gregory Davill](https://github.com/gregdavill), Buzzard now generates tags in KiCad footprint format via the `-o ki` argument.
 
+
+  <hr>
+
+  ## Installation:
+  
+  - Windows: open folder where you download and extracted Buzzard (Buzzard-master), hold **Shift** and **right-click** on that folder and from context menu select **"Open PowerShell Window Here"**. When the window is open, type: **"pip install -r requirements.txt"** and press Enter.
+  
+  ## Usage of _makeLabelGUI_: 
+  
+  1) copy **_makeLabelGUI.ULP_** to the Eagle example folder (recommended), or somewhere else, so you can call it via command line or you can assign shortcut for it (**Option -> Assign**). You can also  leave it at same folder as **buzzard.py** .
+  2) call or open ULP script (id there is not config file, pop up window will show up) and in **Settings** set path to **buzzard.py** script and **select folder and file name** for generating labels. _Optional:_ You can also add address to your managed library, if you have some. You can obtain it by right-click on it and select "Copy URN". 
+  3) select options which you want to save between sessions, write your label and click OK
+
+  #### FAQ and tips
+  - script does not work if you will have **"@"** in your file path 
+  - saving to managed library does not work properly (I need to solve this)
+  - you **can not** generate label with **spaces!** 
+  
+  <hr>
+
 ```
 usage: buzzard.py [-h] [-f FONTNAME] [-s SCALEFACTOR] [-l EAGLELAYERNUMBER]
                   [-v] [-o {b,ls,lib}] [-n SIGNALNAME] [-u SUBSAMPLING]
