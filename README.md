@@ -28,7 +28,7 @@ If you're looking for legacy buzzard, it is still live at [github.io](https://sp
 
 ```
 usage: buzzard.py [-h] [-f FONTNAME] [-s SCALEFACTOR] [-l EAGLELAYERNUMBER]
-                  [-v] [-o {b,ls,lib}] [-n SIGNALNAME] [-u SUBSAMPLING]
+                  [-v] [-o {b,ls,lib,ki,ki5}] [-n SIGNALNAME] [-u SUBSAMPLING]
                   [-t TRACEWIDTH] [-a {tl,cl,bl,tc,cc,bc,tr,cr,br}]
                   labelText
 
