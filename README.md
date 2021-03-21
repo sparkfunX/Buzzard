@@ -4,7 +4,7 @@ If you're looking for legacy buzzard, it is still live at [github.io](https://sp
 
   #### NEW! KiCad Support!
   
-  Thanks to [Gregory Davill](https://github.com/gregdavill), Buzzard now generates tags in KiCad footprint format via the `-o ki` argument.
+  Thanks to [Gregory Davill](https://github.com/gregdavill), Buzzard now generates tags in KiCad footprint format via the `-o ki` and `-o ki5` argument.
 
 
   <hr>
@@ -42,8 +42,8 @@ optional arguments:
   -l EAGLELAYERNUMBER   Layer in EAGLE to create label into (default is tPlace
                         layer 21)
   -v                    Verbose mode (helpful for debugging)
-  -o {b,ls,lib,ki}         Output Mode ('b'=board script, 'ls'=EAGLE library script,
-                        'lib'=EAGLE library file, 'ki'=KiCad footprint)
+  -o {b,ls,lib,ki,ki5}         Output Mode ('b'=board script, 'ls'=EAGLE library script,
+                        'lib'=EAGLE library file, 'ki'=KiCad footprint 'ki5'=KiCad v5 footprint)
   -n SIGNALNAME         Signal name for polygon. Required if layer is not 21
                         (default is 'GND')
   -u SUBSAMPLING        Subsampling Rate (larger values provide smoother curves 
