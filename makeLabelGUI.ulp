@@ -17,9 +17,9 @@ string s;
 string label;
 
 int selectedStart = 0;
-string startTag[] = {" ", "(", "/", "\\", ">", "["};
+string startTag[] = {" ", "(", "/", "\\", "<", ">", "["};
 int selectedEnd = 0;
-string endTag[] = {" ", ")", "/", "\\", "<", "]"};
+string endTag[] = {" ", ")", "/", "\\", "<", ">", "]"};
 real scaleFactor = 0.04;
 int selectedLayer = 2;
 string layers[] = {"1 -Top", "2 - Bottom", "21 - tPlace", "22 - bPlace", "25 - tNames", "26 - bNames"};
@@ -381,7 +381,7 @@ void createLabel()
         s += temp;
     }
 
-    commandToRun += " & " + s + startTag[selectedStart] + label + endTag[selectedEnd];
+    commandToRun += " & " + s + '"' +  startTag[selectedStart] + label + endTag[selectedEnd] + '"';
 
     //dlgMessageBox(commandToRun); //uncomment to see output command
     SaveConfigSettings();
