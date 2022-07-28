@@ -144,24 +144,19 @@ def renderLabel(inString):
         inString = inString[:len(inString)-1]
 
     # Draw and compose the glyph portion of the tag 
+    # The way that this loop works was confusing when revisiting to fix a bug
+    # Additional notes have been added (7/22)
     for charIdx in range(len(inString)):
-        # Check whether this character is a space
-        if inString[charIdx] == ' ':
-            glyphBounds.append(boundingBox(0,0,0,0)) 
-            xOffset += spaceDistance
-            continue
-        # Check whether this character is a backslash that isn't escaped 
-        # and isn't the first character (denoting a backslash-shaped tag)
-        if inString[charIdx] == '\\' and charIdx > 0 and not escaped:
-            glyphBounds.append(boundingBox(0,0,0,0))
-            escaped = True
-            continue
         # If this is a non-escaped '!' mark the beginning of lineover
+        # Define this glyph as having no size and fire the "linover" flag
+        # This flag is used when a renderable character gets handled to 
+        # mark the beginning and end of the lineover
         if inString[charIdx] == '!' and not escaped:
             glyphBounds.append(boundingBox(0,0,0,0))
             lineover = True
             # If we've hit the end of the string but not the end of the lineover
-            # go ahead and finish it out
+            # then the loop will escape here before being able to draw the lineover
+            # so we need to finish the lineover before escaping
             if charIdx == len(inString)-1 and len(lineoverList) > 0:
                 linePaths = []
                 linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
@@ -174,6 +169,32 @@ def renderLabel(inString):
                 lineover = False
                 lineoverList.clear()
             continue
+        # Check whether this character is a backslash that isn't escaped 
+        # and isn't the first character (denoting a backslash-shaped tag)
+        if inString[charIdx] == '\\' and charIdx > 0 and not escaped:
+            glyphBounds.append(boundingBox(0,0,0,0))
+            escaped = True
+            continue
+        # Check whether this character is a space
+        if inString[charIdx] == ' ':    
+            # If we've hit the end of the string but not the end of the lineover
+            # then the loop will escape here before being able to draw the lineover
+            # so we need to finish the lineover before escaping
+            if charIdx == len(inString)-1 and len(lineoverList) > 0:
+                linePaths = []
+                linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
+                linePaths.append(Line(start=complex(xOffset,10), end=complex(xOffset,30)))
+                linePaths.append(Line(start=complex(xOffset,30), end=complex(lineoverList[0], 30)))
+                linePaths.append(Line(start=complex(lineoverList[0], 30), end=complex(lineoverList[0], 10)))
+                linepath = Path(*linePaths)
+                linepath = elPath(linepath.d())
+                finalSegments.append(linepath)
+                lineover = False
+                lineoverList.clear()
+            # Define this glyph as having no size and add the space-width to the xOffset    
+            glyphBounds.append(boundingBox(0,0,0,0)) 
+            xOffset += spaceDistance
+            continue        
         # All special cases end in 'continue' so if we've gotten here we can clear our flags      
         if escaped:
             escaped = False
@@ -245,10 +266,19 @@ def renderLabel(inString):
                 yOffset = glyphPos[inString[charIdx]].imag
             except: 
                 pass
+
+        # If we've reached this point and the lineover flag is set, that means that we need
+        # to either store the beginning offset of the lineover, or render the lineover. 
+        # We use a list object called "lineoverList" to store the offset for the beginning
+        # of a lineover. We can use this list object to determine which action needs to be taken. 
+        # If we have no stored offset in lineoverList, then this is the beginning of a lineover
+        # and we store the offset before resetting the flag...    
         if lineover and len(lineoverList) == 0:
             lineoverList.append(xOffset)
             lineover = False
             
+        # ...If there is an offset in lineoverList, then we need to finish the lineover,
+        # reset the flag, and clear the lineoverList    
         if (lineover and len(lineoverList) > 0):
             linePaths = []
             linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
@@ -272,6 +302,22 @@ def renderLabel(inString):
             except:
                 pass
         xOffset += (glyphBounds[charIdx].xMax - glyphBounds[charIdx].xMin)
+
+        # This is where we handle the "implicit" case, a tag that ends before the lineover 
+        # is explicitly closed (no ending '!') We do this at the very end of the loop so that
+        # the final character's offsets are calculated and the lineover reaches the end of the tag
+        if charIdx == len(inString)-1 and len(lineoverList) > 0:
+            linePaths = []
+            linePaths.append(Line(start=complex(lineoverList[0], 10), end=complex(xOffset,10)))
+            linePaths.append(Line(start=complex(xOffset,10), end=complex(xOffset,30)))
+            linePaths.append(Line(start=complex(xOffset,30), end=complex(lineoverList[0], 30)))
+            linePaths.append(Line(start=complex(lineoverList[0], 30), end=complex(lineoverList[0], 10)))
+            linepath = Path(*linePaths)
+            linepath = elPath(linepath.d())
+            finalSegments.append(linepath)
+            lineover = False
+            lineoverList.clear()    
+
         strIdx += 1
 
     if leftCap == '' and rightCap == '':
