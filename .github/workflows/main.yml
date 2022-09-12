@@ -1,0 +1,43 @@
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "windows-latest"
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+    
+      - name: "Get PyInstaller"
+        run: pip install pyinstaller
+        
+      - name: "Build with PyInstaller"
+        run: pyinstaller --onefile .\buzzard.py
+        
+      - name: "Archive the dist directory"
+        run: powershell -NoLogo -NoProfile -Command Compress-Archive .\dist\* buzzard.zip -Update
+            
+      - name: "Release with Archive"
+        run: |
+          echo "done!"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: buzzard.zip
