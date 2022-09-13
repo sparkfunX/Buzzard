@@ -1,6 +1,7 @@
 from svgpathtools import Line, QuadraticBezier, CubicBezier, Path, Arc, svg2paths2
 from svgelements import Path as elPath, Matrix
 from freetype import Face #pip install freetype-py
+from modules.svgstring2path import string2paths
 import numpy as np
 import argparse
 import svgwrite
@@ -13,9 +14,19 @@ import re
 import xml.etree.ElementTree as XMLET
 import shlex
 import time
+import json
 
-svgstring2path = __import__('modules.svgstring2path', globals(), locals(), ['string2paths'])
-string2paths = svgstring2path.string2paths
+# Fix dirpath errors in frozen EXE release
+if getattr(sys, 'frozen', False):
+    # If the application is run as a bundle, the PyInstaller bootloader
+    # extends the sys module by a flag frozen=True and sets the app 
+    # path into variable _MEIPASS'.
+    # FOR ONE-FOLDER BUNDLES: 
+    # application_path = sys._MEIPASS
+    # FOR ONE-FILE BUNDLES:
+    application_path = os.path.dirname(sys.executable)
+else:
+    application_path = os.path.dirname(os.path.abspath(__file__))
 
 # Takes an x/y tuple and returns a complex number
 def tuple_to_imag(t):
@@ -62,7 +73,9 @@ def renderLabel(inString):
 
     # If we can't find the typeface that the user requested, we have to quit
     try:
-        face = Face(os.path.dirname(os.path.abspath(__file__)) + '/typeface/' + args.fontName + '.ttf')
+        if args.verbose:
+            print("Looking for typeface in " + application_path + '\\typeface\\')
+        face = Face(application_path + '\\typeface\\' + args.fontName + '.ttf')
         face.set_char_size(charSizeX,charSizeY,200,200)
     except:
         print("WARN: No Typeface found with the name " + args.fontName + ".ttf")
@@ -70,9 +83,16 @@ def renderLabel(inString):
 
     # If the typeface that the user requested exists, but there's no position table for it, we'll continue with a warning
     try: 
-        table = __import__('typeface.' + args.fontName, globals(), locals(), ['glyphPos'])
-        glyphPos = table.glyphPos
-        spaceDistance = table.spaceDistance
+        f = open(application_path + '\\typeface\\' + args.fontName + ".json")
+        table = json.load(f)
+        f.close()
+
+        glyphPos = table["glyphPos"]
+        spaceDistance = table["spaceDistance"]
+
+        for key in glyphPos:
+            glyphPos[key] = complex(glyphPos[key])
+
     except:
         glyphPos = 0
         spaceDistance = 60
@@ -798,7 +818,7 @@ def drawSVG(svg_attributes, attributes, paths):
 
 def generate(labelString):
 
-    path_to_script = os.path.dirname(os.path.abspath(__file__))
+    path_to_script = application_path
 
     if args.stdout:
         paths, attributes, svg_attributes = string2paths(renderLabel(labelString).tostring())
@@ -892,7 +912,7 @@ def appendLib(scriptStrings, labelStrings, file):
     # end_num_re = re.compile('[0-9]*$')
     end_num_re = re.compile('(?P<order>[0-9]+)')
 
-
+    #EXPECT ISSUE FOR COMPILE?
     if os.path.exists(file):
         tree = XMLET.parse(file)
         root = tree.getroot()
