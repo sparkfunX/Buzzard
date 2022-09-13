@@ -11,7 +11,13 @@ If you're looking for legacy buzzard, it is still live at [github.io](https://sp
 
   ## Installation:
   
+  ### Run as Python Script
+  
   - Windows: open folder where you download and extracted Buzzard (Buzzard-master), hold **Shift** and **right-click** on that folder and from context menu select **"Open PowerShell Window Here"**. When the window is open, type: **"pip install -r requirements.txt"** and press Enter.
+  
+  ### New! Run as Executable Binary
+  
+  - There is now a 64-bit Windows executable [built with PyInstaller](https://pyinstaller.org/en/stable/) and automatically attached to each stable release. Simply download the `buzzard.zip` file attached to the latest release and use `buzzard.exe` just as you would `buzzard.py`. There are modified Eagle ULP scripts in the release archive that point to the executable as well.
   
   ## Usage of _makeLabelGUI_: 
   
